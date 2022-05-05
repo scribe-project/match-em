@@ -1,0 +1,44 @@
+{
+    "consonants" : {
+        "b" : [1, 0, 0, 0, 0],
+        "c" : [
+            [0, 0, 0, 5, 0],
+            [0, 2, 0, 2, 0]
+        ],
+        "d" : [1, 0, 0, 2, 0],
+        "f" : [0, 2, 0, 1, 0],
+        "g" : [1, 0, 0, 5, 0],
+        "h" : [0, 2, 0, 7, 0],
+        "j" : [1, 3, 0, 4, 0],
+        "k" : [0, 0, 0, 5, 0],
+        "l" : [1, 3, 0, 2, 0],
+        "m" : [1, 0, 1, 0, 0],
+        "n" : [1, 0, 1, 2, 0],
+        "p" : [0, 0, 0, 0, 0],
+        "r" : [
+            [1, 1, 0, 2, 0],
+            [1, 1, 0, 6, 0]
+        ],
+        "s" : [0, 2, 0, 2, 0],
+        "t" : [0, 0, 0, 2, 0],
+        "v" : [1, 2, 0, 1, 0],
+        "w" : [1, 3, 0, 5, 1],
+        "z" : [1, 2, 0, 2, 0]
+    },
+    "vowels" : {
+ 
+        "a" : [2, 0, 0],
+        "e" : [1, 2, 0],
+        "i" : [0, 2, 0],
+        "o" : [0, 0, 1],
+        "u" : [0, 1, 1],
+        "y" : [0, 2, 1],
+        "å" : [1, 0, 1],
+        "æ" : [2, 2, 0],
+        "ø" : [1, 1, 1]
+    },
+    "comments" : {
+        "consonants" : "order is (pipe delim for reading): voiced | class (0 - stop, 1 - fricative, 2 - approx, 3 - trill) | nasal | place (0 - bilabial, 1 - labio-dental, 2 - alveolar, 3 - retroflex (not actuall used), 4 - palatal, 5 - velar, 6 - uvular, 7 - glottal) |lip rounding",
+        "vowels" : " we're only going to use front/backness, hight, and rouding. tense/lax seems to be the domain of short vs long vowels and isn't obvious from orthography. order is height (0 being highest, 2 being lowest) | backness (0 being back, 2 being front) | roundess (0 unround and 1 round). this height and backness puts 0, 0 at the upper right corner of an IPA vowel chart"
+    }
+}
