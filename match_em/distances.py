@@ -15,12 +15,12 @@ def get_character_error_rate(ref, hyp):
         return(0)
 
 def get_sub_cost(word1, word2, allow_greater_than_1=False):
-    # we don't necessarily want a cost larger than 1 so we'll return the CER
-    # if it's smaller than 1 else 1
-    # TODO do we actually want to limit to 1???
+    # allowing a sub cost > 1 means that insertions/deletions will be favoured instead of alignment of dissimilar words
     if allow_greater_than_1:
         return get_character_error_rate(word1, word2)
     else:
+        # we don't necessarily want a cost larger than 1 so we'll return the CER
+        # if it's smaller than 1 else 1
         return min(1, get_character_error_rate(word1, word2))
 
 def paths_not_ending_at_zero(paths):
@@ -74,7 +74,6 @@ class distance():
                 if self.ref[j-1] == self.hyp[i-1]:
                     sub_cost = 0
                 else:
-                    # TODO created dynamic sub cost
                     sub_cost = 1
                 min_alignment = min(
                     self.distance_matrix[i-1, j] + 1,            # deletion

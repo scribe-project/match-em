@@ -67,10 +67,10 @@ def get_norwegian_character_sub_cost(char1, char2):
             return char_diff / max_consonant_difference
     else:
         # we'll slightly lower the cost of subbing a vowel and approximant since they're gestually similar 
-        if char1_type == 'consonants' and char1_vector[1] == 3:
+        if char2_type == 'vowels' and (char1_type == 'consonants' and char1_vector[1] == 3):
             # i just chose this number. idk if it's "right"
             return 0.75
-        elif char2_type == 'consonants' and char2_vector[1] == 3:
+        elif char1_type == 'vowels' and (char2_type == 'consonants' and char2_vector[1] == 3):
             return 0.75
         else:
             return 1

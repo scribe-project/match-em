@@ -9,29 +9,69 @@ from .distances import distance
 
 ignore_chars = ['è', 'é', 'ò', 'ö', 'ü']
 
+def string_insert(string, index, insert_me):
+    return string[:index] + insert_me + string[index:]
+
 def get_alignment_chars(ref, hyp, ops):
+    # ref_index_adjustment = 0
+    # hyp_index_adjustment = 0
+    # index_changes = {}
+    # changes_tuples = []
+    # for op in ops:
+    #     if op[0] == 'insert':
+    #         ref = ref[:op[1] + ref_index_adjustment] + ' ' + ref[op[1] + ref_index_adjustment:]
+    #         index_changes[op[1] + ref_index_adjustment] = 'I'
+    #         hyp_insert = hyp[op[2] + hyp_index_adjustment]
+    #         if hyp_insert not in ignore_chars and hyp_insert != ' ':
+    #             changes_tuples.append((' ', hyp_insert))
+    #         ref_index_adjustment += 1
+    #     elif op[0] == 'delete':
+    #         hyp = hyp[:op[2] + hyp_index_adjustment] + ' ' + hyp[op[2] + hyp_index_adjustment:]
+    #         index_changes[op[2] + hyp_index_adjustment] = 'D'
+    #         ref_del = ref[op[1] + ref_index_adjustment]
+    #         if ref_del not in ignore_chars and ref_del != ' ':
+    #             changes_tuples.append((ref_del, ' '))
+    #         hyp_index_adjustment += 1
+    #     else:
+    #         index_changes[max(op[1], op[2])] = 'S'
+    #         changes_tuples.append((ref[op[1] + ref_index_adjustment], hyp[op[2] + hyp_index_adjustment]))
+    # return changes_tuples, index_changes, ref, hyp
+
     ref_index_adjustment = 0
     hyp_index_adjustment = 0
     index_changes = {}
     changes_tuples = []
+
     for op in ops:
         if op[0] == 'insert':
-            ref = ref[:op[1] + ref_index_adjustment] + ' ' + ref[op[1] + ref_index_adjustment:]
-            index_changes[op[1] + ref_index_adjustment] = 'I'
-            hyp_insert = hyp[op[2] + hyp_index_adjustment]
-            if hyp_insert not in ignore_chars and hyp_insert != ' ':
-                changes_tuples.append((' ', hyp_insert))
+            # incrementing this here to deal with exlusive ranges
             ref_index_adjustment += 1
+            tracking_index = op[2] + hyp_index_adjustment
+            # ref.insert(tracking_index, ' ')
+            ref = string_insert(ref, tracking_index, ' ')
+            index_changes[tracking_index] = ' '
+            hyp_insert = hyp[tracking_index]
+            if hyp_insert not in ignore_chars and hyp_insert != ' ':
+                changes_tuples.append((' ', hyp_insert, tracking_index))
+            
         elif op[0] == 'delete':
-            hyp = hyp[:op[2] + hyp_index_adjustment] + ' ' + hyp[op[2] + hyp_index_adjustment:]
-            index_changes[op[2] + hyp_index_adjustment] = 'D'
-            ref_del = ref[op[1] + ref_index_adjustment]
-            if ref_del not in ignore_chars and ref_del != ' ':
-                changes_tuples.append((ref_del, ' '))
+            # incrementing this here to deal with exlusive ranges
             hyp_index_adjustment += 1
+            tracking_index = op[1] + ref_index_adjustment
+            # hyp.insert(tracking_index, ' ')
+            hyp = string_insert(hyp, tracking_index, ' ')
+            index_changes[tracking_index] = ' '
+            ref_del = ref[tracking_index]
+            if ref_del not in ignore_chars and ref_del != ' ':
+                changes_tuples.append((ref_del, ' ', tracking_index))
         else:
-            index_changes[max(op[1], op[2])] = 'S'
-            changes_tuples.append((ref[op[1] + ref_index_adjustment], hyp[op[2] + hyp_index_adjustment]))
+            ### debugging 
+            if op[1] + ref_index_adjustment != op[2] + hyp_index_adjustment:
+                raise Exception('ref and hyp are somehow different lengths!')
+            tracking_index = op[1] + ref_index_adjustment
+            ### ### ### 
+            index_changes[tracking_index] = 'S'
+            changes_tuples.append((ref[tracking_index], hyp[tracking_index], tracking_index))
     return changes_tuples, index_changes, ref, hyp
 
 def get_alignment_words(ref, hyp, ops):

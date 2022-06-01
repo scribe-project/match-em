@@ -136,3 +136,6 @@ dmypy.json
 */artifacts/*
 
 wav2vec/nb_tale_mod3_asure_wav2vec.csv
+
+*/matchem_venv/*
+matchem_venv/*
