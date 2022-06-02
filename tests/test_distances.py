@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 
-from match_em_aligner import distances
+from match_em import distances
 
 class AlignmentsTests(unittest.TestCase):
 

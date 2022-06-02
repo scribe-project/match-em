@@ -10,6 +10,7 @@ from .character_distances import get_norwegian_character_sub_cost
 
 def get_character_error_rate(ref, hyp):
     if len(ref) > 0:
+        # TODO: do we want to keep using this instead of weighted char? 
         return len(Levenshtein.editops(ref, hyp)) / len(ref)
     else:
         return(0)
@@ -120,8 +121,8 @@ class distance():
 
     def compute_weighted_character_alignment(self):
         # i hope this doesn't mess something else up?
-        self.ref = self.ref[0]
-        self.hyp = self.hyp[0]
+        self.ref = ' '.join(self.ref)
+        self.hyp = ' '.join(self.hyp)
 
         # generate new, clean matrixes
         self.generate_matrixes()

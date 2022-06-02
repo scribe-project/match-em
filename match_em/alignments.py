@@ -49,7 +49,7 @@ def get_alignment_chars(ref, hyp, ops):
             tracking_index = op[2] + hyp_index_adjustment
             # ref.insert(tracking_index, ' ')
             ref = string_insert(ref, tracking_index, ' ')
-            index_changes[tracking_index] = ' '
+            index_changes[tracking_index] = 'I'
             hyp_insert = hyp[tracking_index]
             if hyp_insert not in ignore_chars and hyp_insert != ' ':
                 changes_tuples.append((' ', hyp_insert, tracking_index))
@@ -60,7 +60,7 @@ def get_alignment_chars(ref, hyp, ops):
             tracking_index = op[1] + ref_index_adjustment
             # hyp.insert(tracking_index, ' ')
             hyp = string_insert(hyp, tracking_index, ' ')
-            index_changes[tracking_index] = ' '
+            index_changes[tracking_index] = 'D'
             ref_del = ref[tracking_index]
             if ref_del not in ignore_chars and ref_del != ' ':
                 changes_tuples.append((ref_del, ' ', tracking_index))
@@ -156,7 +156,7 @@ def print_alignment_chars(ref, hyp, ops, do_print=True, max_width=250, only_prin
             print()
     return ref_print_str, hyp_print_str, chg_print_str
 
-def print_alignment_words(ref, hyp, index_changes={}, do_print=True, print_char_alignments=True, only_print_subs=True, max_width=250):
+def print_alignment_words(ref, hyp, index_changes={}, do_print=False, print_char_alignments=True, only_print_subs=False, max_width=250):
     ref = deepcopy(ref)
     hyp = deepcopy(hyp)
 
@@ -219,14 +219,16 @@ def print_alignment_words(ref, hyp, index_changes={}, do_print=True, print_char_
                         ref_print_str += ' {}  || '.format(pad_alignment_token(ref[i], longest_alignment_token))
                         hyp_print_str += ' {}  || '.format(pad_alignment_token(hyp[i], longest_alignment_token))
                 else:
+                    use_ref = ref[i] if ref[i] != ' ' else ''
+                    use_hyp = hyp[i] if hyp[i] != ' ' else ''
                     char_ref_str, char_hyp_str, char_cng_str = print_alignment_chars(
-                        ref[i] if ref[i] != ' ' else '', 
-                        hyp[i] if hyp[i] != ' ' else '', 
+                        use_ref, 
+                        use_hyp, 
                         # Levenshtein.editops(
                         #     ref[i] if ref[i] != ' ' else '', 
                         #     hyp[i] if hyp[i] != ' ' else ''
                         # ),
-                        distance(ref[i] if ref[i] != ' ' else '', hyp[i] if hyp[i] != ' ' else '').get_weighted_character_editops(),
+                        distance(use_ref, use_hyp).get_weighted_character_editops(),
                         do_print=False, 
                         only_print_subs=False
                     )

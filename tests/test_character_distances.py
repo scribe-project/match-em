@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 
-from match_em_aligner import character_distances
+import match_em.character_distances as character_distances
 
 class character_distances_test(unittest.TestCase):
 
@@ -84,9 +84,20 @@ class character_distances_test(unittest.TestCase):
     def test_sub_cost_a_t(self):
         sub_cost = character_distances.get_norwegian_character_sub_cost('a', 't')
         self.assertEqual(sub_cost, 1)
-    def test_sub_cost_a_r(self):
+    def test_sub_cost_a_l(self):
+        # discount from 1 bc vowel and liquid
         sub_cost = character_distances.get_norwegian_character_sub_cost('a', 'l')
-        self.assertEqual(sub_cost, 0.75)
+        self.assertEqual(sub_cost, 0.9)
+
+    def test_sub_cost_spc_spc(self):
+        sub_cost = character_distances.get_norwegian_character_sub_cost(' ', ' ')
+        self.assertEqual(sub_cost, 0)
+    def test_sub_cost_spc_a(self):
+        sub_cost = character_distances.get_norwegian_character_sub_cost(' ', 'a')
+        self.assertEqual(sub_cost, 1)
+    def test_sub_cost_spc_b(self):
+        sub_cost = character_distances.get_norwegian_character_sub_cost(' ', 'b')
+        self.assertEqual(sub_cost, 1)
 
 if __name__ == '__main__':
     unittest.main()

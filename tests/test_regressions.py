@@ -1,6 +1,6 @@
 import unittest
 
-from match_em_aligner import analysis
+from match_em import analysis
 
 '''
 These are the tests that orignally lived in teh the wav2vec_wer_tester.ipynb file.
@@ -47,24 +47,23 @@ expected_prints = {
     3: '--- UNK_ID (WER: 29.63, compounds created: 1, compounds broken up: 1)---\n men  ||     |   |      ||  etter  ||  hvert  ||  så  ||  ble  ||   j | e | g    ||   v | a | n | t |   | l | i | g    ||   d | e | t    ||  og  ||  ble  ||  vant  ||  til  ||  å  ||  være  ||   s | a | m | m | e | n    ||   m | e | d    ||  dyra  ||   n | e | d |   | i    ||  laben  ||   d | e | r    ||  og  ||  det  ||  var  ||  egentlig  ||  ganske  ||  trivelig  || \n men  ||   e | e | e    ||  etter  ||  hvert  ||  så  ||  ble  ||   d | e | t    ||   v | a | n |   |   | l | i | g    ||     |   |      ||  og  ||  ble  ||  vant  ||  til  ||  å  ||  være  ||   s | a | m | m | e |      ||     |   |      ||  dyra  ||   n | e | d |   | i    ||  laben  ||     | e | r    ||  og  ||  det  ||  var  ||  egentlig  ||  ganske  ||  trivelig  || \n      ||   I | I | I    ||         ||         ||      ||       ||   S |   | S    ||     |   |   | D | D |   |   |      ||   D | D | D    ||      ||       ||        ||       ||     ||        ||     |   |   |   |   | D    ||   D | D | D    ||        ||     |   |   | I |      ||         ||   D |   |      ||      ||       ||       ||            ||          ||            || \n\n',
     4: '''
     --- UNK_ID (WER: 59.09, compounds created: 0, compounds broken up: 0)---
- da  ||   b | l | e    ||   d | e | t    ||   n | e | m | l | i | g    ||   s | l | i | k    ||     |   |   |   |   |   |   | a | t    ||     |   |   | d | e    ||   s | p | i | l | t | e    ||   e |   | n    ||     | e |   |   | n    ||   h | j | e | m | m | e    ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||   t | o    ||  to  ||     |   |   | d | a    ||  på  ||   u | l | l | e | v | å | l    || 
- da  ||     |   |      ||     |   |      ||     |   |   |   |   |      ||     | v | a | r    ||   n | e | m | i | s | i | k | k | e    ||   s | p | i | l | t    ||     |   |   |   | e | n    ||   e | i | n    ||   h | e | i | m | e    ||     |   |   |   |   | i    ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||     |      ||  to  ||   t | o | r | e | r    ||  på  ||   u | l | l | e | v | a | l    || 
-     ||   D | D | D    ||   D | D | D    ||   D | D | D | D | D | D    ||   D | S | S | S    ||   I | I | I | I | I | I | I | S | S    ||   I | I | I | S | S    ||   D | D | D | D | S | S    ||     | I |      ||   I |   | I | I | S    ||   D | D | D | D | D | S    ||          ||          ||      ||      ||       ||       ||   D | D    ||      ||   I | I | I | S | S    ||      ||     |   |   |   |   | S |      || 
+ da  ||   b | l | e    ||   d | e | t    ||   n | e | m | l | i | g    ||   s | l | i | k    ||     | a |   |   | t |   |   |   |      ||   d |   | e |   |      ||   s | p | i | l | t | e    ||   e |   | n    ||     | e |   | n |      ||   h | j | e | m | m | e    ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||   t | o    ||  to  ||   d | a |   |   |      ||  på  ||   u | l | l | e | v | å | l    || 
+ da  ||     |   |      ||     |   |      ||     |   |   |   |   |      ||   v |   | a | r    ||   n | e | m | i | s | i | k | k | e    ||   s | p | i | l | t    ||     |   | e |   | n |      ||   e | i | n    ||   h | e | i | m | e    ||     |   | i |   |   |      ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||     |      ||  to  ||   t | o | r | e | r    ||  på  ||   u | l | l | e | v | a | l    || 
+     ||   D | D | D    ||   D | D | D    ||   D | D | D | D | D | D    ||   S | D | S | S    ||   I | S | I | I | S | I | I | I | I    ||   S | I | S | I | I    ||   D | D | S | D | S | D    ||     | I |      ||   I |   | I | S | I    ||   D | D | S | D | D | D    ||          ||          ||      ||      ||       ||       ||   D | D    ||      ||   S | S | I | I | I    ||      ||     |   |   |   |   | S |      || 
 '''
 }
 
 def final_prints_the_same(truth, test_result):
     truth_lines = [l.strip() for l in truth.split('\n') if l.strip() != '']
     test_lines = [l.strip() for l in test_result.split('\n') if l.strip() != '']
-    for l in range(len(test_lines)):
-        if test_lines[l] != truth_lines[l]:
-            print('''
-            ---
-            -{}-
-            -{}-
-            ---
 
-            '''.format(truth_lines[l], test_lines[l]))
+    if truth_lines != test_lines:    
+        with open('debug_temp.txt', 'a') as open_f:
+            open_f.write('-----------Test Boundary----------------')
+            open_f.write(truth)
+            open_f.write(test_result)
+            open_f.write('\n')
+
     return(truth_lines == test_lines)
 
 if __name__ == '__main__':

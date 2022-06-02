@@ -1,3 +1,3 @@
-from .match_em_aligner import analysis
+from .match_em import analysis
 
 name = "match_em"

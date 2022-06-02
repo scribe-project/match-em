@@ -26,7 +26,6 @@
         "z" : [1, 2, 0, 2, 0]
     },
     "vowels" : {
- 
         "a" : [2, 0, 0],
         "e" : [1, 2, 0],
         "i" : [0, 2, 0],
@@ -36,6 +35,9 @@
         "å" : [1, 0, 1],
         "æ" : [2, 2, 0],
         "ø" : [1, 1, 1]
+    },
+    "spaces" : {
+        " " : []
     },
     "comments" : {
         "consonants" : "order is (pipe delim for reading): voiced | class (0 - stop, 1 - fricative, 2 - approx, 3 - trill) | nasal | place (0 - bilabial, 1 - labio-dental, 2 - alveolar, 3 - retroflex (not actuall used), 4 - palatal, 5 - velar, 6 - uvular, 7 - glottal) |lip rounding",

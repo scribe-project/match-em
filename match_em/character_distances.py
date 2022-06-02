@@ -23,6 +23,8 @@ class character_traits:
             return ('vowels', self.character_details['vowels'][char])
         elif char in self.character_details['consonants']:
             return ('consonants', self.character_details['consonants'][char])
+        elif char in self.character_details['spaces']:
+            return ('spaces', self.character_details['spaces'][char])
         else:
             raise Exception('Unknown character: {}'.format(char))
     
@@ -59,18 +61,20 @@ def get_norwegian_character_sub_cost(char1, char2):
             max_vowel_difference = np.sqrt(np.square(2) + np.square(2) + np.square(2))
             char_diff = norwegian_character_distance(char1_vector, char2_vector)
             return char_diff / max_vowel_difference
-        else:
-            # if, for some reason, we have something other than a vowel or consonant this isn't checking for it lol
+        elif char1_type == 'consonants':
             # if how we define consonants change this will need to change too
             max_consonant_difference = np.sqrt(np.square(1) + np.square(3) + np.square(1) + np.square(7) + np.square(1))
             char_diff = norwegian_character_distance(char1_vector, char2_vector)
             return char_diff / max_consonant_difference
+        else:
+            # dealing with spaces 
+            return 0
     else:
         # we'll slightly lower the cost of subbing a vowel and approximant since they're gestually similar 
         if char2_type == 'vowels' and (char1_type == 'consonants' and char1_vector[1] == 3):
             # i just chose this number. idk if it's "right"
-            return 0.75
+            return 0.9
         elif char1_type == 'vowels' and (char2_type == 'consonants' and char2_vector[1] == 3):
-            return 0.75
+            return 0.9
         else:
             return 1

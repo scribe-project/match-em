@@ -1,5 +1,5 @@
 import unittest
-from match_em_aligner import alignments
+from match_em import alignments
 
 class AlignmentsTests(unittest.TestCase):
     pass
