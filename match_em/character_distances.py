@@ -25,6 +25,8 @@ class character_traits:
             return ('consonants', self.character_details['consonants'][char])
         elif char in self.character_details['spaces']:
             return ('spaces', self.character_details['spaces'][char])
+        elif char in self.character_details['punctuation']:
+            return ('punctuation', self.character_details['punctuation'][char])
         else:
             raise Exception('Unknown character: {}'.format(char))
     
@@ -66,6 +68,9 @@ def get_norwegian_character_sub_cost(char1, char2):
             max_consonant_difference = np.sqrt(np.square(1) + np.square(3) + np.square(1) + np.square(7) + np.square(1))
             char_diff = norwegian_character_distance(char1_vector, char2_vector)
             return char_diff / max_consonant_difference
+        elif char1_type == 'punctuation':
+            # TODO: care about punctuation in the future
+            return 0
         else:
             # dealing with spaces 
             return 0
