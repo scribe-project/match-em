@@ -286,7 +286,7 @@ def get_character_change_count(ref, hyp):
 
 def check_word_compounding(changes_tuples, index_changes, ref, hyp):
     created_compound=0
-    brokeup_compount=0
+    brokeup_compound=0
     i = 0
     while i < len(changes_tuples):
         change_tup = changes_tuples[i]
@@ -344,7 +344,7 @@ def check_word_compounding(changes_tuples, index_changes, ref, hyp):
                     left_delta_del = 0
             
             if left_delta_del  > 0 and left_delta_edit > 0:
-                brokeup_compount += 1
+                brokeup_compound += 1
                 # adjust the hypothesis to have the compound but keep a space so the character comparison will realize the change 
                 hyp[change_index-1] = hyp[change_index-1] + ' ' + change_tup[1]
                 # remove the extra word and deletion space
@@ -363,7 +363,7 @@ def check_word_compounding(changes_tuples, index_changes, ref, hyp):
                 changes_tuples = [((ct[0], ct[1], ct[2]-1) if ct[2] > change_index else ct) for ct in changes_tuples]
                 # don't increment i because we've decreased the changes_tuple list so i should now be pointing at the next item
             elif right_delta_del  > 0 and right_delta_edit > 0:
-                brokeup_compount += 1
+                brokeup_compound += 1
                 # adjust the reference to have the "compound" but keep a space so the character comparison will realize the change 
                 hyp[change_index+1] = change_tup[1] + ' ' + hyp[change_index+1]
                 # remove the extra word and deletion space
@@ -467,4 +467,4 @@ def check_word_compounding(changes_tuples, index_changes, ref, hyp):
         else:
             # this is a substitution pair so we'll pass
             i += 1
-    return changes_tuples, index_changes, ref, hyp, created_compound, brokeup_compount
+    return changes_tuples, index_changes, ref, hyp, created_compound, brokeup_compound
