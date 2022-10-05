@@ -1,4 +1,3 @@
-# from .alignments import * 
 from .alignments_new import check_word_compounding
 from .alignments import get_alignment_words, get_alignment_chars, print_alignment_words
 from .distances import distance
@@ -55,6 +54,8 @@ def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=se
         reference = [reference]
     if isinstance(hypothesis, str):
         hypothesis = [hypothesis]
+    if isinstance(utterance_ids, str):
+        utterance_ids = [utterance_ids]
     if len(utterance_ids) < len(reference):
         utterance_ids = utterance_ids + ['UNK_ID'] * (len(reference) -  len(utterance_ids))
 
