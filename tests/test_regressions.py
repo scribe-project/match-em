@@ -32,6 +32,17 @@ class AlignmentsTests(unittest.TestCase):
         results = analysis.compute_mistakes(ref, hyp)
         self.assertTrue(final_prints_the_same(expected_prints[4], results['final_print'])) 
 
+    def test_regression_5(self):
+        ref = "DAIHATSU HøYNET SIN GUIDING onsdag".lower()
+        hyp = 'DA HATSU HøYNETSINGUIDING onsdag'.lower()
+        utt_id = ['p1_g01_f1_2_b0065']
+        results = analysis.compute_mistakes(
+            ref, 
+            hyp, 
+            utt_id, 
+            distance_method='weighted_manual'
+        )
+        self.assertTrue(final_prints_the_same(expected_prints[5], results['final_print'])) 
 
 expected_prints = {
     1: '''--- UNK_ID (WER: 60.0, compounds created: 1, compounds broken up: 0)---
@@ -46,10 +57,16 @@ expected_prints = {
     ''',
     3: '--- UNK_ID (WER: 29.63, compounds created: 1, compounds broken up: 1)---\n men  ||     |   |      ||  etter  ||  hvert  ||  så  ||  ble  ||   j | e | g    ||   v | a | n | t |   | l | i | g    ||   d | e | t    ||  og  ||  ble  ||  vant  ||  til  ||  å  ||  være  ||   s | a | m | m | e | n    ||   m | e | d    ||  dyra  ||   n | e | d |   | i    ||  laben  ||   d | e | r    ||  og  ||  det  ||  var  ||  egentlig  ||  ganske  ||  trivelig  || \n men  ||   e | e | e    ||  etter  ||  hvert  ||  så  ||  ble  ||   d | e | t    ||   v | a | n |   |   | l | i | g    ||     |   |      ||  og  ||  ble  ||  vant  ||  til  ||  å  ||  være  ||   s | a | m | m | e |      ||     |   |      ||  dyra  ||   n | e | d |   | i    ||  laben  ||     | e | r    ||  og  ||  det  ||  var  ||  egentlig  ||  ganske  ||  trivelig  || \n      ||   I | I | I    ||         ||         ||      ||       ||   S |   | S    ||     |   |   | D | D |   |   |      ||   D | D | D    ||      ||       ||        ||       ||     ||        ||     |   |   |   |   | D    ||   D | D | D    ||        ||     |   |   | I |      ||         ||   D |   |      ||      ||       ||       ||            ||          ||            || \n\n',
     4: '''
-    --- UNK_ID (WER: 59.09, compounds created: 0, compounds broken up: 0)---
- da  ||   b | l | e    ||   d | e | t    ||   n | e | m | l | i | g    ||   s | l | i | k    ||     | a |   |   | t |   |   |   |      ||   d |   | e |   |      ||   s | p | i | l | t | e    ||   e |   | n    ||     | e |   | n |      ||   h | j | e | m | m | e    ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||   t | o    ||  to  ||   d | a |   |   |      ||  på  ||   u | l | l | e | v | å | l    || 
- da  ||     |   |      ||     |   |      ||     |   |   |   |   |      ||   v |   | a | r    ||   n | e | m | i | s | i | k | k | e    ||   s | p | i | l | t    ||     |   | e |   | n |      ||   e | i | n    ||   h | e | i | m | e    ||     |   | i |   |   |      ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||     |      ||  to  ||   t | o | r | e | r    ||  på  ||   u | l | l | e | v | a | l    || 
-     ||   D | D | D    ||   D | D | D    ||   D | D | D | D | D | D    ||   S | D | S | S    ||   I | S | I | I | S | I | I | I | I    ||   S | I | S | I | I    ||   D | D | S | D | S | D    ||     | I |      ||   I |   | I | S | I    ||   D | D | S | D | D | D    ||          ||          ||      ||      ||       ||       ||   D | D    ||      ||   S | S | I | I | I    ||      ||     |   |   |   |   | S |      || 
+--- UNK_ID (WER: 59.09, compounds created: 1, compounds broken up: 0)---
+ da  ||   b | l | e    ||   d | e | t    ||   n | e | m | l | i | g    ||   s | l | i | k    ||   a | t |   | d | e |   |   |   | s | p | i | l | t | e    ||     |   |   |   |      ||   e | n    ||   e |   | n    ||   h | j | e | m | m | e    ||        ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||   t | o    ||  to  ||   d | a |   |   |      ||  på  ||   u | l | l | e | v | å | l    || 
+ da  ||     |   |      ||     |   |      ||     |   |   |   |   |      ||   v |   | a | r    ||     | n | e | m | i |   |   |   | s |   | i | k | k | e    ||   s | p | i | l | t    ||   e | n    ||   e | i | n    ||   h |   | e | i | m | e    ||   i    ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||     |      ||  to  ||   t | o | r | e | r    ||  på  ||   u | l | l | e | v | a | l    || 
+     ||   D | D | D    ||   D | D | D    ||   D | D | D | D | D | D    ||   S | D | S | S    ||   D | S | S | S | S | D | D | D |   | D |   | S | S |      ||   I | I | I | I | I    ||     |      ||     | I |      ||     | D |   | S |   |      ||   I    ||          ||          ||      ||      ||       ||       ||   D | D    ||      ||   S | S | I | I | I    ||      ||     |   |   |   |   | S |      || 
+''',
+    5: '''
+    --- p1_g01_f1_2_b0065 (WER: 66.67, compounds created: 1, compounds broken up: 1)---
+  d | a | i | h | a | t | s | u    ||   h | ø | y | n | e | t |   | s | i | n |   | g | u | i | d | i | n | g    ||  onsdag  || 
+  d | a |   | h | a | t | s | u    ||   h | ø | y | n | e | t |   | s | i | n |   | g | u | i | d | i | n | g    ||  onsdag  || 
+    |   | S |   |   |   |   |      ||     |   |   |   |   |   | D |   |   |   | D |   |   |   |   |   |   |      ||          || 
 '''
 }
 

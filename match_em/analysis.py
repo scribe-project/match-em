@@ -1,4 +1,6 @@
-from .alignments import * 
+# from .alignments import * 
+from .alignments_new import check_word_compounding
+from .alignments import get_alignment_words, get_alignment_chars, print_alignment_words
 from .distances import distance
 import Levenshtein
 from collections import defaultdict
@@ -29,7 +31,7 @@ Known compounds
 
 '''
 
-def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=set(), distance_method='Levenshtein', print_to_file='', allow_greater_than_1_sub_cost=False) -> dict:
+def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=set(), distance_method='Levenshtein', print_to_file='', allow_greater_than_1_sub_cost=False, compute_cer_with_weighted_alignment=False) -> dict:
     """
     :param reference: the ground-truth sentence(s) as a string or list of strings
     :param hypothesis: the hypothesis sentence(s) as a string or list of strings
@@ -63,6 +65,8 @@ def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=se
     char_level_references = 0
     compounds_created = 0
     compounds_deleted = 0
+    joins_in_created_compound = 0
+    joins_in_broken_compound = 0
     word_miss_pairs = defaultdict(int)
     compound_miss_pairs = defaultdict(int)
     char_miss_pairs_word_bound = defaultdict(int)
@@ -87,14 +91,16 @@ def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=se
         # now take the edit operations and adjust the utterances to they align (e.g. add spaces where there was an insertion or deletion)
         changes_tuples, index_changes, ref, hyp = get_alignment_words(ref, hyp, computed_editops)
         # now check if we have any compound words that have been created or deleted
-        changes_tuples, index_changes, ref, hyp, created_compound, brokeup_compound = check_word_compounding(changes_tuples, index_changes, ref, hyp)
+        ref, hyp, changes_tuples, index_changes, created_compound, brokeup_compound, join_in_created_compound, join_in_broken_compound = check_word_compounding(ref, hyp, changes_tuples)
 
         word_align = print_alignment_words(ref, hyp, index_changes=index_changes, only_print_subs=False, do_print=False)
 
         edit_count_word = len(changes_tuples)
         ref_count_word = len(ref)
-        # char_editops = Levenshtein.editops(' '.join(ref), ' '.join(hyp))
-        char_editops = distance(' '.join(ref), ' '.join(hyp)).get_weighted_character_editops()
+        if compute_cer_with_weighted_alignment:
+            char_editops = distance(' '.join(ref), ' '.join(hyp)).get_weighted_character_editops()
+        else:
+            char_editops = Levenshtein.editops(' '.join(ref), ' '.join(hyp))
         changes_tuples_chars, index_changes_chars, ref_char, hyp_char = get_alignment_chars(' '.join(ref), ' '.join(hyp), char_editops)
         edit_count_char = len(char_editops)
         ref_count_char = len(' '.join(ref))
@@ -106,11 +112,13 @@ def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=se
         char_level_references += ref_count_char
         compounds_created += created_compound
         compounds_deleted += brokeup_compound
+        joins_in_created_compound += join_in_created_compound
+        joins_in_broken_compound += join_in_broken_compound
 
         word_miss_pairs, compound_miss_pairs, char_miss_pairs_word_bound, char_miss_trigrams_word_bound = _count_word_mistakes(index_changes, ref, hyp, word_miss_pairs, compound_miss_pairs, char_miss_pairs_word_bound, char_miss_trigrams_word_bound)
 
         for change_tup in changes_tuples_chars:
-            add_tuple = (change_tup[0], change_tup[1])
+            add_tuple = str((change_tup[0], change_tup[1]))
             char_miss_pairs_word_unbound[add_tuple] += 1
 
         # check for known compounds in the reference
@@ -140,6 +148,8 @@ def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=se
         'char_level_references' : char_level_references,
         'compounds_created' : compounds_created,
         'compounds_deleted' : compounds_deleted,
+        'joins_in_created_compound' : joins_in_created_compound,
+        'joins_in_broken_compound' : joins_in_broken_compound,
         'word_miss_pairs' : word_miss_pairs,
         'compound_miss_pairs' : compound_miss_pairs,
         'char_miss_pairs_word_bound' : char_miss_pairs_word_bound,
@@ -155,6 +165,8 @@ def wer(results: dict, level_of_precision=3) -> float:
     :param results: the results object returned from compute_mistakes()
     :return: WER
     '''
+    if not results['word_level_references']:
+        return None
     return round(100 * (results['word_level_errors']/results['word_level_references']), level_of_precision)
 
 def cer(results: dict, level_of_precision=3) -> float:
@@ -217,7 +229,7 @@ def _get_word_level_character_change_trigrams(ref_word, hyp_word):
 
 def _count_word_character_mistakes(word_char_changes_tuples, char_miss_pairs_word_bound):
     for word_char_change_tup in word_char_changes_tuples:
-        add_tuple = (word_char_change_tup[0], word_char_change_tup[1])
+        add_tuple = str((word_char_change_tup[0], word_char_change_tup[1]))
         char_miss_pairs_word_bound[add_tuple] += 1
     return char_miss_pairs_word_bound
 
@@ -227,12 +239,12 @@ def _count_word_mistakes(index_changes, ref, hyp, word_miss_pairs, compound_miss
         hyp_token = hyp[index_change]
         if ref_token == ' ' or hyp_token == ' ':
             # this is a word-level insertion or deletion
-            word_miss_pairs[(ref_token, hyp_token)] += 1
+            word_miss_pairs[str((ref_token, hyp_token))] += 1
         else:
             if ' ' in ref_token or ' ' in hyp_token:
-                compound_miss_pairs[(ref_token, hyp_token)] += 1
+                compound_miss_pairs[str((ref_token, hyp_token))] += 1
             else:
-                word_miss_pairs[(ref_token, hyp_token)] += 1
+                word_miss_pairs[str((ref_token, hyp_token))] += 1
         # now add in the inter-word character changes
         char_miss_pairs_word_bound = _count_word_character_mistakes(_get_word_level_character_changes(ref_token, hyp_token), char_miss_pairs_word_bound)
         char_miss_trigrams_word_bound = _count_word_character_mistakes(_get_word_level_character_change_trigrams(ref_token, hyp_token), char_miss_trigrams_word_bound)

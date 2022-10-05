@@ -11,6 +11,12 @@ class character_distances_test(unittest.TestCase):
         self.assertEqual(char_type, 'vowels')
         self.assertEqual(str([2,0,0]), str(char_vector))
 
+    def test_char_lookup_é(self):
+        char_traits = character_distances.character_traits()
+        (char_type, char_vector) = char_traits.lookup_character('é')
+        self.assertEqual(char_type, 'vowels')
+        self.assertEqual(str([1,2,0]), str(char_vector))
+
     def test_char_distances_i_a(self):
         dist = character_distances.norwegian_character_distance(
             [0, 2, 0],
