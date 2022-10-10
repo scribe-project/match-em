@@ -57,10 +57,10 @@ expected_prints = {
     ''',
     3: '--- UNK_ID (WER: 29.63, compounds created: 1, compounds broken up: 1)---\n men  ||     |   |      ||  etter  ||  hvert  ||  så  ||  ble  ||   j | e | g    ||   v | a | n | t |   | l | i | g    ||   d | e | t    ||  og  ||  ble  ||  vant  ||  til  ||  å  ||  være  ||   s | a | m | m | e | n    ||   m | e | d    ||  dyra  ||   n | e | d |   | i    ||  laben  ||   d | e | r    ||  og  ||  det  ||  var  ||  egentlig  ||  ganske  ||  trivelig  || \n men  ||   e | e | e    ||  etter  ||  hvert  ||  så  ||  ble  ||   d | e | t    ||   v | a | n |   |   | l | i | g    ||     |   |      ||  og  ||  ble  ||  vant  ||  til  ||  å  ||  være  ||   s | a | m | m | e |      ||     |   |      ||  dyra  ||   n | e | d |   | i    ||  laben  ||     | e | r    ||  og  ||  det  ||  var  ||  egentlig  ||  ganske  ||  trivelig  || \n      ||   I | I | I    ||         ||         ||      ||       ||   S |   | S    ||     |   |   | D | D |   |   |      ||   D | D | D    ||      ||       ||        ||       ||     ||        ||     |   |   |   |   | D    ||   D | D | D    ||        ||     |   |   | I |      ||         ||   D |   |      ||      ||       ||       ||            ||          ||            || \n\n',
     4: '''
---- UNK_ID (WER: 59.09, compounds created: 1, compounds broken up: 0)---
- da  ||   b | l | e    ||   d | e | t    ||   n | e | m | l | i | g    ||   s | l | i | k    ||   a | t |   | d | e |   |   |   | s | p | i | l | t | e    ||     |   |   |   |      ||   e | n    ||   e |   | n    ||   h | j | e | m | m | e    ||        ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||   t | o    ||  to  ||   d | a |   |   |      ||  på  ||   u | l | l | e | v | å | l    || 
- da  ||     |   |      ||     |   |      ||     |   |   |   |   |      ||   v |   | a | r    ||     | n | e | m | i |   |   |   | s |   | i | k | k | e    ||   s | p | i | l | t    ||   e | n    ||   e | i | n    ||   h |   | e | i | m | e    ||   i    ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||     |      ||  to  ||   t | o | r | e | r    ||  på  ||   u | l | l | e | v | a | l    || 
-     ||   D | D | D    ||   D | D | D    ||   D | D | D | D | D | D    ||   S | D | S | S    ||   D | S | S | S | S | D | D | D |   | D |   | S | S |      ||   I | I | I | I | I    ||     |      ||     | I |      ||     | D |   | S |   |      ||   I    ||          ||          ||      ||      ||       ||       ||   D | D    ||      ||   S | S | I | I | I    ||      ||     |   |   |   |   | S |      || 
+--- UNK_ID (WER: 54.55, compounds created: 1, compounds broken up: 0)---
+ da  ||   b | l | e    ||   d | e | t    ||   n | e | m | l | i | g    ||   s | l | i | k    ||   a | t |   | d | e |   |   |   | s | p | i | l | t | e    ||     |   |   |   |      ||  en  ||   e |   | n    ||   h | j | e | m | m | e    ||        ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||   t | o    ||  to  ||   d | a |   |   |      ||  på  ||   u | l | l | e | v | å | l    || 
+ da  ||     |   |      ||     |   |      ||     |   |   |   |   |      ||   v |   | a | r    ||     | n | e | m | i |   |   |   | s |   | i | k | k | e    ||   s | p | i | l | t    ||  en  ||   e | i | n    ||   h |   | e | i | m | e    ||   i    ||  første  ||  kampen  ||  og  ||  så  ||  ble  ||  det  ||     |      ||  to  ||   t | o | r | e | r    ||  på  ||   u | l | l | e | v | a | l    || 
+     ||   D | D | D    ||   D | D | D    ||   D | D | D | D | D | D    ||   S | D | S | S    ||   D | S | S | S | S | D | D | D |   | D |   | S | S |      ||   I | I | I | I | I    ||      ||     | I |      ||     | D |   | S |   |      ||   I    ||          ||          ||      ||      ||       ||       ||   D | D    ||      ||   S | S | I | I | I    ||      ||     |   |   |   |   | S |      || 
 ''',
     5: '''
     --- p1_g01_f1_2_b0065 (WER: 66.67, compounds created: 1, compounds broken up: 1)---
@@ -75,7 +75,7 @@ def final_prints_the_same(truth, test_result):
     test_lines = [l.strip() for l in test_result.split('\n') if l.strip() != '']
 
     if truth_lines != test_lines:    
-        with open('debug_temp.txt', 'a') as open_f:
+        with open('/Users/plparson/Documents/development/match-em/tests/debug_temp.txt', 'a') as open_f:
             open_f.write('-----------Test Boundary----------------')
             open_f.write(truth)
             open_f.write(test_result)

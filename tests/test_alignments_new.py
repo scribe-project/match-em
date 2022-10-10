@@ -546,6 +546,82 @@ class AlignmentsNewTests(unittest.TestCase):
             broken_joins
         )
 
+    def test_check_word_compounding_realEx_4(self):
+        change_tuples = [(' ', 'totusenogto', 1), ('to', 'ble', 2), ('tusen', 'den', 3), ('og', 'nå', 4), ('to', ' ', 5), ('ble', ' ', 6), ('nguyen', 'igjen', 7), ('singapore', 'singapor', 14)]
+        ref = ['i', ' '          , 'to', 'tusen', 'og', 'to', 'ble', 'nguyen', 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapore', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        hyp = ['i', 'totusenogto', 'ble', 'den' , 'nå', ' ' , ' '  , 'igjen' , 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapor' , 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['i', 'to tusen og to', 'ble', ' '  , ' ' , 'nguyen', 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapore', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        )
+        self.assertEqual(
+            hyp,
+            ['i', 'totusenogto'   , 'ble', 'den', 'nå', 'igjen' , 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapor', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        )
+        self.assertEqual(
+            change_tuples,
+            [('to tusen og to', 'totusenogto', 1), (' ', 'den', 3), (' ', 'nå', 4), ('nguyen', 'igjen', 5), ('singapore', 'singapor', 12)]
+        )
+        self.assertEqual(
+            1,
+            created_count
+        )
+        self.assertEqual(
+            0,
+            broken_count
+        )
+        self.assertEqual(
+            3,
+            created_joins
+        )
+        self.assertEqual(
+            0,
+            broken_joins
+        )
+
+    def test_check_word_compounding_realEx_4_reverse(self):
+        change_tuples = [('totusenogto', ' ', 1), ('ble', 'to', 2), ('den', 'tusen', 3), ('nå', 'og', 4), (' ', 'to', 5), (' ', 'ble', 6), ('igjen', 'nguyen', 7), ('singapor', 'singapore', 14)]
+        ref = ['i', 'totusenogto', 'ble', 'den' , 'nå', ' ' , ' '  , 'igjen' , 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapor' , 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        hyp = ['i', ' '          , 'to', 'tusen', 'og', 'to', 'ble', 'nguyen', 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapore', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['i', 'totusenogto'   , 'ble', 'den', 'nå', 'igjen' , 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapor', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        )
+        self.assertEqual(
+            hyp,
+            ['i', 'to tusen og to', 'ble', ' '  , ' ' , 'nguyen', 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapore', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
+        )
+        self.assertEqual(
+            change_tuples,
+            [('totusenogto', 'to tusen og to', 1), ('den', ' ', 3), ('nå', ' ', 4), ('igjen', 'nguyen', 5), ('singapor', 'singapore', 12)]
+        )
+        self.assertEqual(
+            0,
+            created_count
+        )
+        self.assertEqual(
+            1,
+            broken_count
+        )
+        self.assertEqual(
+            0,
+            created_joins
+        )
+        self.assertEqual(
+            3,
+            broken_joins
+        )
+
         
 if __name__ == '__main__':
     unittest.main()
