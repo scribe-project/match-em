@@ -507,6 +507,45 @@ class AlignmentsNewTests(unittest.TestCase):
             1,
             broken_joins
         )
+
+    def test_check_word_compounding_realEx_3(self):
+        change_tuples = [('av', 'har', 1), ('hjortane', 'gjort', 2), (' ', 'den', 3), ('er', 'her', 4), ('daude', 'daue', 5), ('vart', 'ble', 8)]
+        ref = ['to', 'av', 'hjortane', ' ', 'er', 'daude', 'og', 'det', 'vart', 'onsdag', 'kveld', 'gjennomført', 'søk', 'etter', 'den', 'tredje']
+        hyp = ['to', 'har', 'gjort', 'den', 'her', 'daue', 'og', 'det', 'ble', 'onsdag', 'kveld', 'gjennomført', 'søk', 'etter', 'den', 'tredje']
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['to', 'av', 'hjortane', ' ', 'er', 'daude', 'og', 'det', 'vart', 'onsdag', 'kveld', 'gjennomført', 'søk', 'etter', 'den', 'tredje']
+        )
+        self.assertEqual(
+            hyp,
+            ['to', 'har', 'gjort', 'den', 'her', 'daue', 'og', 'det', 'ble', 'onsdag', 'kveld', 'gjennomført', 'søk', 'etter', 'den', 'tredje']
+        )
+        self.assertEqual(
+            change_tuples,
+            [('av', 'har', 1), ('hjortane', 'gjort', 2), (' ', 'den', 3), ('er', 'her', 4), ('daude', 'daue', 5), ('vart', 'ble', 8)]
+        )
+        self.assertEqual(
+            0,
+            created_count
+        )
+        self.assertEqual(
+            0,
+            broken_count
+        )
+        self.assertEqual(
+            0,
+            created_joins
+        )
+        self.assertEqual(
+            0,
+            broken_joins
+        )
+
         
 if __name__ == '__main__':
     unittest.main()

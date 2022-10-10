@@ -210,11 +210,12 @@ def check_word_compounding(ref, hyp, change_tuples):
         # try shifting hyp right
         token_lists, change_tuples, _ = shift_right(token_lists, change_tuples, 'hyp')
         # keep trying to shift as long as there's more shifts to be found
+        token_lists = [clean_tokens(token_lists[0]), clean_tokens(token_lists[1])]
         if org_tokens == token_lists:
             still_changing = False
     
-    ref = clean_tokens(token_lists[0])
-    hyp = clean_tokens(token_lists[1])
+    ref = token_lists[0]
+    hyp = token_lists[1]
     change_tuples = clean_change_tuples(change_tuples)
     created_count, broken_count, created_joins, broken_joins = count_compounds_created_broken(change_tuples)
     
