@@ -622,6 +622,44 @@ class AlignmentsNewTests(unittest.TestCase):
             broken_joins
         )
 
+    def test_check_word_compounding_realEx_5(self):
+        change_tuples = [('ø', ' ', 1), ('også', 'oss', 3), ('ærlig', ' ', 4), ('at', 'av', 5), (' ', 'ærlighet', 6), ('troféløse', 'trofelesesesong', 8), ('sesong', ' ', 9)]
+        ref = ['don', 'ø', 'innrømmer', 'også', 'ærlig', 'at', ' '       , 'fjorårets', 'troféløse',     'sesong', 'var', 'en', 'dyp', 'skuffelse']
+        hyp = ['don', ' ', 'innrømmer', 'oss' , '     ', 'av', 'ærlighet', 'fjorårets', 'trofelesesesong', ' '   , 'var', 'en', 'dyp', 'skuffelse']
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['don', 'ø', 'innrømmer', 'også', ' ',  'ærlig at', 'fjorårets', 'troféløse sesong', 'var', 'en', 'dyp', 'skuffelse']
+        )
+        self.assertEqual(
+            hyp,
+            ['don', ' ', 'innrømmer', 'oss' , 'av', 'ærlighet', 'fjorårets', 'trofelesesesong' , 'var', 'en', 'dyp', 'skuffelse']
+        )
+        self.assertEqual(
+            change_tuples,
+            [('ø', ' ', 1), ('også', 'oss', 3), (' ', 'av', 4), ('ærlig at', 'ærlighet', 5), ('troféløse sesong', 'trofelesesesong', 7)]
+        )
+        self.assertEqual(
+            2,
+            created_count
+        )
+        self.assertEqual(
+            0,
+            broken_count
+        )
+        self.assertEqual(
+            2,
+            created_joins
+        )
+        self.assertEqual(
+            0,
+            broken_joins
+        )
+
         
 if __name__ == '__main__':
     unittest.main()
