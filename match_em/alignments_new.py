@@ -143,7 +143,8 @@ def shift_right(token_lists, change_tuples, shifting):
     for i in range(len(change_tuples)-1):
         change_tup = change_tuples[i]
         if change_tup[shifting_to_index[shifting]] != ' ':
-            for shift_amount in range(1, 1 + (len(change_tuples) - i)):
+            diff = len(staying_tokens) - change_tup[2] 
+            for shift_amount in range(1, diff):
                 next_staying_token = staying_tokens[change_tup[2] + shift_amount]
                 next_shifting_token = shifting_tokens[change_tup[2] + shift_amount]
                 base_cer = get_character_change_count(next_staying_token, next_shifting_token)

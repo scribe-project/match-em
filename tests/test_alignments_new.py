@@ -660,6 +660,85 @@ class AlignmentsNewTests(unittest.TestCase):
             broken_joins
         )
 
+    def test_check_word_compounding_realEx_6(self):
+        change_tuples = [('don', ' ', 0), ('ærlig', 'ærlighet', 4), ('at', ' ', 5), ('fjorårets', 'fjor', 6), ('troféløse', 'er', 7), ('sesong', 'et', 8), (' ', 'trofelesesesong', 9)]
+        ref = ['don', 'ø', 'innrømmer', 'også', 'ærlig'   , 'at', 'fjorårets', 'troféløse', 'sesong', ' '              , 'var', 'en', 'dyp', 'skuffelse']
+        hyp = [' '  , 'ø', 'innrømmer', 'også', 'ærlighet', ' ' , 'fjor'     , 'er'       , 'et'    , 'trofelesesesong', 'var', 'en', 'dyp', 'skuffelse']
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['don', 'ø', 'innrømmer', 'også', 'ærlig at', 'fjorårets' , 'troféløse sesong', 'var', 'en', 'dyp', 'skuffelse']
+        )
+        self.assertEqual(
+            hyp,
+            [' '  , 'ø', 'innrømmer', 'også', 'ærlighet', 'fjor er et', 'trofelesesesong' , 'var', 'en', 'dyp', 'skuffelse']
+
+        )
+        self.assertEqual(
+            change_tuples,
+            [('don', ' ', 0), ('ærlig at', 'ærlighet', 4), ('fjorårets', 'fjor er et', 5), ('troféløse sesong', 'trofelesesesong', 6)]
+        )
+        self.assertEqual(
+            2,
+            created_count
+        )
+        self.assertEqual(
+            1,
+            broken_count
+        )
+        self.assertEqual(
+            2,
+            created_joins
+        )
+        self.assertEqual(
+            2,
+            broken_joins
+        )
+
+    def test_check_word_compounding_realEx_7(self):
+        change_tuples = [('actionspill', 'aktion', 14), (' ', 'spill', 15)]
+        ref = ['men', 'uansett', 'om', 'man', 'mener', 'detaljgraden', 'er', 'spekulativ', 'eller', 'ikke', 'er', 'dette', 'et', 'bra', 'actionspill', ' ']
+        hyp = ['men', 'uansett', 'om', 'man', 'mener', 'detaljgraden', 'er', 'spekulativ', 'eller', 'ikke', 'er', 'dette', 'et', 'bra', 'aktion', 'spill']
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['men', 'uansett', 'om', 'man', 'mener', 'detaljgraden', 'er', 'spekulativ', 'eller', 'ikke', 'er', 'dette', 'et', 'bra', 'actionspill']
+        )
+        self.assertEqual(
+            hyp,
+            ['men', 'uansett', 'om', 'man', 'mener', 'detaljgraden', 'er', 'spekulativ', 'eller', 'ikke', 'er', 'dette', 'et', 'bra', 'aktion spill']
+
+        )
+        self.assertEqual(
+            change_tuples,
+            [('actionspill', 'aktion spill', 14)]
+        )
+        self.assertEqual(
+            0,
+            created_count
+        )
+        self.assertEqual(
+            1,
+            broken_count
+        )
+        self.assertEqual(
+            0,
+            created_joins
+        )
+        self.assertEqual(
+            1,
+            broken_joins
+        )
+
+
         
 if __name__ == '__main__':
     unittest.main()
