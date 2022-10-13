@@ -26,6 +26,29 @@ class AlignmentsNewTests(unittest.TestCase):
             res
         )
 
+    def test_change_tuples_ct_index_update_minus_1(self):
+        change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
+        res = alignments.update_change_tuples_ct_index(
+            change_tuples,
+            5
+        )
+        self.assertEqual(
+            [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 8), (' ', 'av', 9), ('jente', 'jenter', 10), ('nødkeisersnitt', 'nødkaisersnitt', 12)],
+            res
+        )
+
+    def test_change_tuples_ct_index_update_plus_1(self):
+        change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
+        res = alignments.update_change_tuples_ct_index(
+            change_tuples,
+            5,
+            1
+        )
+        self.assertEqual(
+            [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 10), (' ', 'av', 11), ('jente', 'jenter', 12), ('nødkeisersnitt', 'nødkaisersnitt', 14)],
+            res
+        )
+
     def test_del_ins_series_1(self):
         ref = ['this', 'is', ' ', 'test']
         hyp = ['this', ' ' , 'a', 'test']
@@ -439,6 +462,62 @@ class AlignmentsNewTests(unittest.TestCase):
             broken_joins
         )
 
+    def test_undo_unnecessary_compounding_single(self):
+        ref = ['nei', 'er det', 'barneserie']
+        hyp = ['nei', ' ', 'barnet serie']
+        change_tuples = [('er det', ' ', 1), ('barneserie', 'barnet serie', 2)]
+        ref, hyp, change_tuples = alignments.undo_unnecessary_compounding(ref, hyp, change_tuples)
+        self.assertEqual(
+            ref,
+            ['nei', 'er', 'det', 'barneserie']
+        )
+        self.assertEqual(
+            hyp,
+            ['nei', ' ', ' ', 'barnet serie']
+
+        )
+        self.assertEqual(
+            change_tuples,
+            [('er', ' ', 1), ('det', ' ', 2), ('barneserie', 'barnet serie', 3)]
+        )
+
+    def test_undo_unnecessary_compounding_triple_word(self):
+        ref = ['nei', 'er det en', 'barneserie']
+        hyp = ['nei', ' ', 'barnet serie']
+        change_tuples = [('er det en', ' ', 1), ('barneserie', 'barnet serie', 2)]
+        ref, hyp, change_tuples = alignments.undo_unnecessary_compounding(ref, hyp, change_tuples)
+        self.assertEqual(
+            ref,
+            ['nei', 'er', 'det', 'en', 'barneserie']
+        )
+        self.assertEqual(
+            hyp,
+            ['nei', ' ', ' ', ' ', 'barnet serie']
+
+        )
+        self.assertEqual(
+            change_tuples,
+            [('er', ' ', 1), ('det', ' ', 2), ('en', ' ', 3), ('barneserie', 'barnet serie', 4)]
+        )
+
+    def test_undo_unnecessary_compounding_triple_word_hyp(self):
+        ref = ['nei', ' ', 'barnet serie']
+        hyp = ['nei', 'er det en', 'barneserie']
+        change_tuples = [(' ', 'er det en', 1), ('barnet serie', 'barneserie', 2)]
+        ref, hyp, change_tuples = alignments.undo_unnecessary_compounding(ref, hyp, change_tuples)
+        self.assertEqual(
+            ref,
+            ['nei', ' ', ' ', ' ', 'barnet serie']
+        )
+        self.assertEqual(
+            hyp,
+            ['nei', 'er', 'det', 'en', 'barneserie']
+        )
+        self.assertEqual(
+            change_tuples,
+            [(' ', 'er', 1), (' ', 'det', 2), (' ', 'en', 3), ('barnet serie', 'barneserie', 4)]
+        )
+
     def test_check_word_compounding_realEx_1(self):
         change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
         ref = ['fredag', 'tjuefjerde', 'september', 'to', 'tusen',       'og',  'ti', 'forløses', 'ei', 'lita',  ' ', 'jente', 'ved', 'nødkeisersnitt']
@@ -805,6 +884,44 @@ class AlignmentsNewTests(unittest.TestCase):
             broken_joins
         )
 
+    def test_check_word_compounding_realEx9(self):
+        change_tuples = [('er', ' ', 1), ('det', 'barnet', 2), ('barneserie', 'serie', 3)]
+        ref = ['nei', 'er', 'det', 'barneserie']
+        hyp = ['nei', ' ', 'barnet', 'serie']
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['nei', 'er', 'det', 'barneserie']
+        )
+        self.assertEqual(
+            hyp,
+            ['nei', ' ', ' ', 'barnet serie']
+
+        )
+        self.assertEqual(
+            change_tuples,
+            [('er', ' ', 1), ('det', ' ', 2), ('barneserie', 'barnet serie', 3)]
+        )
+        self.assertEqual(
+            0,
+            created_count
+        )
+        self.assertEqual(
+            1,
+            broken_count
+        )
+        self.assertEqual(
+            0,
+            created_joins
+        )
+        self.assertEqual(
+            1,
+            broken_joins
+        )
 
         
 if __name__ == '__main__':

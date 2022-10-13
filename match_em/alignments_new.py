@@ -10,6 +10,10 @@ def update_change_tuples(change_tuples, index_greater_than, change_by=-1):
     change_by = int(change_by)
     return [(ct[0], ct[1], ct[2] + change_by if ct[2] > index_greater_than else ct[2]) for ct in change_tuples]
 
+def update_change_tuples_ct_index(change_tuples, index_greater_than, change_by=-1):
+    change_by = int(change_by)
+    return [(ct[0], ct[1], ct[2] + change_by if i > index_greater_than else ct[2]) for i, ct in enumerate(change_tuples)]
+
 def fix_del_ins_series(ref, hyp, change_tuples):
     # we want to exclude the last item because we look at the +1 tuple to try to combine
     for i in range(len(change_tuples) - 1):
@@ -223,6 +227,35 @@ def clean_tokens(tokens):
 def clean_change_tuples(change_tuples):
     return[(strip_whitespace_item(change_tup[0]), strip_whitespace_item(change_tup[1]), change_tup[2]) for change_tup in change_tuples]
 
+def undo_unnecessary_compounding(ref, hyp, change_tuples):
+    for i, change_tup in enumerate(change_tuples):
+        if ' ' in change_tup[0] and change_tup[0] != ' ':
+            if change_tup[1] == ' ':
+                # ref is a compound and hyp is empty. We want multiple deletions instead
+                uncompounded_words = change_tup[0].split()
+                # update the first index
+                ref[change_tup[2]] = uncompounded_words[0]
+                change_tuples[i] = (uncompounded_words[0], ' ', change_tup[2])
+                for tok_i in range(1, len(uncompounded_words)):
+                    ref.insert(change_tup[2] + tok_i, uncompounded_words[tok_i])
+                    hyp.insert(change_tup[2] + tok_i, ' ')
+                    change_tuples.insert(i + tok_i, (uncompounded_words[tok_i], ' ', change_tup[2] + tok_i))
+                    change_tuples = update_change_tuples_ct_index(change_tuples, index_greater_than=i + tok_i, change_by=1)
+        elif ' ' in change_tup[1] and change_tup[1] != ' ':
+            if change_tup[0] == ' ':
+                # ref is a compound and hyp is empty. We want multiple deletions instead
+                uncompounded_words = change_tup[1].split()
+                # update the first index
+                hyp[change_tup[2]] = uncompounded_words[0]
+                change_tuples[i] = (' ', uncompounded_words[0], change_tup[2])
+                for tok_i in range(1, len(uncompounded_words)):
+                    ref.insert(change_tup[2] + tok_i, ' ')
+                    hyp.insert(change_tup[2] + tok_i, uncompounded_words[tok_i])
+                    change_tuples.insert(i + tok_i, (' ', uncompounded_words[tok_i], change_tup[2] + tok_i))
+                    change_tuples = update_change_tuples_ct_index(change_tuples, index_greater_than=i + tok_i, change_by=1)
+    return ref, hyp, change_tuples
+    
+
 def check_word_compounding(ref, hyp, change_tuples):
     still_changing = True
     token_lists = [ref, hyp]
@@ -244,6 +277,7 @@ def check_word_compounding(ref, hyp, change_tuples):
     ref = token_lists[0]
     hyp = token_lists[1]
     change_tuples = clean_change_tuples(change_tuples)
+    ref, hyp, change_tuples = undo_unnecessary_compounding(ref, hyp, change_tuples)
     created_count, broken_count, created_joins, broken_joins = count_compounds_created_broken(change_tuples)
     
     return ref, hyp, change_tuples, generate_index_changes(change_tuples), created_count, broken_count, created_joins, broken_joins
