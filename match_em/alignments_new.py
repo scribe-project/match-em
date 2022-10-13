@@ -16,7 +16,7 @@ def fix_del_ins_series(ref, hyp, change_tuples):
         change_tup = change_tuples[i]
         if change_tup[0] == ' ':
             next_tup = change_tuples[i+1]
-            if next_tup[1] == ' ':
+            if next_tup[1] == ' ' and abs(change_tup[2] - next_tup[2]) == 1:
                 # update the ref and hyp
                 ref.pop(change_tup[2])
                 hyp.pop(next_tup[2])
@@ -31,7 +31,7 @@ def fix_del_ins_series(ref, hyp, change_tuples):
                 return(fix_del_ins_series(ref, hyp, change_tuples))
         elif change_tup[1] == ' ':
             next_tup = change_tuples[i+1]
-            if next_tup[0] == ' ':
+            if next_tup[0] == ' ' and abs(change_tup[2] - next_tup[2]) == 1:
                 # update the ref and hyp
                 hyp.pop(change_tup[2])
                 ref.pop(next_tup[2])

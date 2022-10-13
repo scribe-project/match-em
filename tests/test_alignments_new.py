@@ -26,7 +26,7 @@ class AlignmentsNewTests(unittest.TestCase):
             res
         )
 
-    def test_del_ins_series(self):
+    def test_del_ins_series_1(self):
         ref = ['this', 'is', ' ', 'test']
         hyp = ['this', ' ' , 'a', 'test']
         change_tuples = [('is', ' ', 1), (' ', 'a', 2)]
@@ -44,7 +44,7 @@ class AlignmentsNewTests(unittest.TestCase):
             [('is', 'a', 1)]
         )
 
-    def test_ins_del_series(self):
+    def test_ins_del_series_2(self):
         ref = ['this', ' ' , 'a', 'test']
         hyp = ['this', 'is', ' ', 'test']
         change_tuples = [(' ', 'is', 1), ('a', ' ', 2)]
@@ -78,6 +78,24 @@ class AlignmentsNewTests(unittest.TestCase):
         self.assertEqual(
             new_changes,
             [('is', 'a', 1), ('nice', 'the', 4)]
+        )
+
+    def test_del_ins_one_block(self):
+        ref = ['this', 'is', 'a', ' '   , 'of', ' '  , 'nice', 'system']
+        hyp = ['this', ' ' , 'a', 'test', 'of', 'the', ' '  , 'system']
+        change_tuples = [('is', ' ', 1), (' ', 'test', 3), (' ', 'the', 5), ('nice', ' ', 6)]
+        new_ref, new_hyp, new_changes = alignments.fix_del_ins_series(ref, hyp, change_tuples)
+        self.assertEqual(
+            new_ref,
+            ['this', 'is', 'a', ' ', 'of', 'nice', 'system']
+        )
+        self.assertEqual(
+            new_hyp,
+            ['this', ' ' , 'a', 'test', 'of', 'the',  'system']
+        )
+        self.assertEqual(
+            new_changes,
+            [('is', ' ', 1), (' ', 'test', 3), ('nice', 'the', 5)]
         )
 
     def test_remove_spaces(self):
@@ -731,6 +749,55 @@ class AlignmentsNewTests(unittest.TestCase):
         )
         self.assertEqual(
             0,
+            created_joins
+        )
+        self.assertEqual(
+            1,
+            broken_joins
+        )
+
+    def test_check_word_compounding_realEx8(self):
+        change_tuples = [('sergej', 'sergei', 0), ('bubka', 'bobka', 1), (' ', 'nyleder', 3), (' ', 'for', 4), ('ny', 'io', 5), ('leder', 'sas', 6), (' ', 'oto', 7), ('iocs', 'komi', 9), ('utøverkommisjon', 'kjønn', 10)]
+        ref = ['sergej', 'bubka', 'er', ' '      , ' '  , 'ny', 'leder', ' '  , 'for', 'iocs', 'utøverkommisjon']
+        hyp = ['sergei', 'bobka', 'er', 'nyleder', 'for', 'io', 'sas'  , 'oto', 'for', 'komi', 'kjønn'          ]
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+            ref,
+            hyp,
+            change_tuples
+        )
+        self.assertEqual(
+            ref,
+            ['sergej', 'bubka', 'er', 'ny leder', ' '  , ' ' , ' ' , ' ' , 'for', 'iocs', 'utøverkommisjon']
+        )
+        self.assertEqual(
+            hyp,
+            ['sergei', 'bobka', 'er', 'nyleder', 'for', 'io', 'sas', 'oto', 'for', ' ', 'komi kjønn']
+
+        )
+        self.assertEqual(
+            change_tuples,
+            [
+                ('sergej', 'sergei', 0), 
+                ('bubka', 'bobka', 1), 
+                ('ny leder', 'nyleder', 3),
+                (' ', 'for', 4), 
+                (' ', 'io', 5), 
+                (' ', 'sas', 6), 
+                (' ', 'oto', 7), 
+                ('iocs', ' ', 9), 
+                ('utøverkommisjon', 'komi kjønn', 10)
+            ]
+        )
+        self.assertEqual(
+            1,
+            created_count
+        )
+        self.assertEqual(
+            1,
+            broken_count
+        )
+        self.assertEqual(
+            1,
             created_joins
         )
         self.assertEqual(
