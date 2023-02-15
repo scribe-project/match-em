@@ -5,7 +5,7 @@ from copy import deepcopy
 from operator import itemgetter
 from itertools import chain
 
-from .character_distances import get_norwegian_character_sub_cost
+from .character_distances import get_character_sub_cost
 
 
 def get_character_error_rate(ref, hyp):
@@ -133,7 +133,7 @@ class distance():
                 if self.ref[j-1] == self.hyp[i-1]:
                     sub_cost = 0
                 else:
-                    sub_cost = get_norwegian_character_sub_cost(self.ref[j-1],self.hyp[i-1])
+                    sub_cost = get_character_sub_cost(self.ref[j-1],self.hyp[i-1], self.language)
                 min_alignment = min(
                     self.distance_matrix[i-1, j] + 1,            # deletion
                     self.distance_matrix[i, j-1] + 1,            # insertion 
@@ -252,7 +252,7 @@ class distance():
         editops = Levenshtein.editops(truth_chars, hypothesis_chars)
         return editops
 
-    def __init__(self, ref: str, hyp: str) -> None:
+    def __init__(self, ref: str, hyp: str, language: str) -> None:
         ref = deepcopy(ref)
         hyp = deepcopy(hyp)
 
@@ -263,3 +263,4 @@ class distance():
             hyp = hyp.split(' ')
         self.ref = ref
         self.hyp = hyp
+        self.language = language

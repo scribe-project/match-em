@@ -14,8 +14,15 @@ except ImportError:
 
 from . import character_data
 
-def _read_character_traits() -> set:
-    return json.loads(pkg_resources.read_text(character_data, 'character_traits.json'))
+def _read_character_traits(langugage: str) -> set:
+    loaded_json = json.loads(pkg_resources.read_text(character_data, 'character_traits.json'))
+    if langugage in loaded_json:
+        return loaded_json[langugage]
+    raise Exception('Unknown language: {}. Please either use one of {} or define a new language'.format(
+        langugage,
+        list(loaded_json.keys())
+    ))
+
 
 class character_traits:
     def lookup_character(self, char):
@@ -30,20 +37,20 @@ class character_traits:
         else:
             raise Exception('Unknown character: {}'.format(char))
     
-    def __init__(self):
-        self.character_details = _read_character_traits()
+    def __init__(self, language):
+        self.character_details = _read_character_traits(language)
 
-def norwegian_character_distance(v1, v2):
+def calculate_character_distance(v1, v2):
     # just euclidian distance
     if isinstance(v1[0], tuple) or isinstance(v1[0], list):
         distances = []
         for v1_tup in v1:
-            distances.append(norwegian_character_distance(v1_tup, v2))
+            distances.append(calculate_character_distance(v1_tup, v2))
         return min(distances)
     elif isinstance(v2[0], tuple) or isinstance(v2[0], list):
         distances = []
         for v2_tup in v2:
-            distances.append(norwegian_character_distance(v1, v2_tup))
+            distances.append(calculate_character_distance(v1, v2_tup))
         return min(distances)
     else:
         dist = np.sqrt(
@@ -52,8 +59,8 @@ def norwegian_character_distance(v1, v2):
         )
         return dist
 
-def get_norwegian_character_sub_cost(char1, char2):
-    char_traits = character_traits()
+def get_character_sub_cost(char1, char2, language):
+    char_traits = character_traits(language)
     (char1_type, char1_vector) = char_traits.lookup_character(char1)
     (char2_type, char2_vector) = char_traits.lookup_character(char2)
     if char1_type == char2_type:
@@ -61,12 +68,12 @@ def get_norwegian_character_sub_cost(char1, char2):
         if char1_type == 'vowels':
             # if how we define vowels change this will need to change too
             max_vowel_difference = np.sqrt(np.square(2) + np.square(2) + np.square(2))
-            char_diff = norwegian_character_distance(char1_vector, char2_vector)
+            char_diff = calculate_character_distance(char1_vector, char2_vector)
             return char_diff / max_vowel_difference
         elif char1_type == 'consonants':
             # if how we define consonants change this will need to change too
             max_consonant_difference = np.sqrt(np.square(1) + np.square(3) + np.square(1) + np.square(7) + np.square(1))
-            char_diff = norwegian_character_distance(char1_vector, char2_vector)
+            char_diff = calculate_character_distance(char1_vector, char2_vector)
             return char_diff / max_consonant_difference
         elif char1_type == 'punctuation':
             # TODO: care about punctuation in the future
