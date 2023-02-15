@@ -7,7 +7,7 @@ from itertools import chain
 
 from .distances import distance
 
-ignore_chars = ['è', 'é', 'ò', 'ö', 'ü']
+# ignore_chars = ['è', 'é', 'ò', 'ö', 'ü']
 
 def string_insert(string, index, insert_me):
     return string[:index] + insert_me + string[index:]
@@ -51,7 +51,9 @@ def get_alignment_chars(ref, hyp, ops):
             ref = string_insert(ref, tracking_index, ' ')
             index_changes[tracking_index] = 'I'
             hyp_insert = hyp[tracking_index]
-            if hyp_insert not in ignore_chars and hyp_insert != ' ':
+            # 20230215 I have no rememberance of why ignore_chars is here so we're going to get rid of it
+            # if hyp_insert not in ignore_chars and hyp_insert != ' ':
+            if hyp_insert != ' ':
                 changes_tuples.append((' ', hyp_insert, tracking_index))
             
         elif op[0] == 'delete':
@@ -62,7 +64,9 @@ def get_alignment_chars(ref, hyp, ops):
             hyp = string_insert(hyp, tracking_index, ' ')
             index_changes[tracking_index] = 'D'
             ref_del = ref[tracking_index]
-            if ref_del not in ignore_chars and ref_del != ' ':
+            # 20230215 I have no rememberance of why ignore_chars is here so we're going to get rid of it
+            # if ref_del not in ignore_chars and ref_del != ' ':
+            if ref_del != ' ':
                 changes_tuples.append((ref_del, ' ', tracking_index))
         else:
             ### debugging 
@@ -97,7 +101,9 @@ def get_alignment_words(ref, hyp, ops):
             ref.insert(tracking_index, ' ')
             index_changes[tracking_index] = ' '
             hyp_insert = hyp[tracking_index]
-            if hyp_insert not in ignore_chars and hyp_insert != ' ':
+            # 20230215 I have no rememberance of why ignore_chars is here so we're going to get rid of it
+            # if hyp_insert not in ignore_chars and hyp_insert != ' ':
+            if hyp_insert != ' ':
                 changes_tuples.append((' ', hyp_insert, tracking_index))
             
         elif op[0] == 'delete':
@@ -107,7 +113,9 @@ def get_alignment_words(ref, hyp, ops):
             hyp.insert(tracking_index, ' ')
             index_changes[tracking_index] = ' '
             ref_del = ref[tracking_index]
-            if ref_del not in ignore_chars and ref_del != ' ':
+            # 20230215 I have no rememberance of why ignore_chars is here so we're going to get rid of it
+            # if ref_del not in ignore_chars and ref_del != ' ':
+            if ref_del != ' ':
                 changes_tuples.append((ref_del, ' ', tracking_index))
         else:
             ### debugging 

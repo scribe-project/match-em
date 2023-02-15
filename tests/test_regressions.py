@@ -44,6 +44,19 @@ class AlignmentsTests(unittest.TestCase):
         )
         self.assertTrue(final_prints_the_same(expected_prints[5], results['final_print'])) 
 
+    def test_regression_6(self):
+        ref = 'come flexbox e animazioni css'
+        hyp = 'meflex box e animazioni ci è sterse'
+        results = analysis.compute_mistakes(
+            ref, 
+            hyp, 
+            distance_method='weighted_manual',
+            allow_greater_than_1_sub_cost=True,
+            language='it'
+        )
+        self.assertTrue(final_prints_the_same(expected_prints[6], results['final_print'])) 
+
+
 expected_prints = {
     1: '''--- UNK_ID (WER: 60.0, compounds created: 1, compounds broken up: 0)---
   f | r | å    ||  neste  ||   v | e | k | e |   | a | v    ||   v | a | r | t    ||  altså  || 
@@ -67,6 +80,12 @@ expected_prints = {
   d | a | i | h | a | t | s | u    ||   h | ø | y | n | e | t |   | s | i | n |   | g | u | i | d | i | n | g    ||  onsdag  || 
   d | a |   | h | a | t | s | u    ||   h | ø | y | n | e | t |   | s | i | n |   | g | u | i | d | i | n | g    ||  onsdag  || 
     |   | S |   |   |   |   |      ||     |   |   |   |   |   | D |   |   |   | D |   |   |   |   |   |   |      ||          || 
+''',
+    6:'''
+--- UNK_ID (WER: 71.43, compounds created: 0, compounds broken up: 1)---
+  c | o | m | e    ||     |   | f | l | e | x |   | b | o | x    ||  e  ||  animazioni  ||     |      ||        ||     | c |   | s | s |      || 
+    |   |   |      ||   m | e | f | l | e | x |   | b | o | x    ||  e  ||  animazioni  ||   c | i    ||   è    ||   s | t | e | r | s | e    || 
+  D | D | D | D    ||   I | I |   |   |   |   | I |   |   |      ||     ||              ||   I | I    ||   I    ||   I | S | I | S |   | I    ||
 '''
 }
 
@@ -74,8 +93,17 @@ def final_prints_the_same(truth, test_result):
     truth_lines = [l.strip() for l in truth.split('\n') if l.strip() != '']
     test_lines = [l.strip() for l in test_result.split('\n') if l.strip() != '']
 
-    if truth_lines != test_lines:    
-        with open('/Users/plparson/Documents/development/match-em/tests/debug_temp.txt', 'a') as open_f:
+    if truth_lines != test_lines:
+        for i in range(len(truth_lines)):
+            if truth_lines[i] != test_lines[i]:
+                print("This one (test)->{}<-".format(test_lines[i]))
+                print('v.s. (truth)->{}<-'.format(truth_lines[i]))
+        import os
+        debug_temp = '/localhome/stipendiater/plparson/match-em/tests/debug_temp.txt'
+        open_method = 'w'
+        if os.path.isfile(debug_temp):
+            open_method = 'a'
+        with open(debug_temp, open_method) as open_f:
             open_f.write('-----------Test Boundary----------------')
             open_f.write(truth)
             open_f.write(test_result)
