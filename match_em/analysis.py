@@ -30,7 +30,18 @@ Known compounds
 
 '''
 
-def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=set(), distance_method='Levenshtein', print_to_file='', allow_greater_than_1_sub_cost=False, compute_cer_with_weighted_alignment=False, language='no') -> dict:
+def compute_mistakes(
+        reference, 
+        hypothesis, 
+        utterance_ids=[], 
+        known_compounds=set(), 
+        distance_method='Levenshtein', 
+        check_compounding=True,
+        print_to_file='', 
+        allow_greater_than_1_sub_cost=False, 
+        compute_cer_with_weighted_alignment=False, 
+        language='no'
+    ) -> dict:
     """
     :param reference: the ground-truth sentence(s) as a string or list of strings
     :param hypothesis: the hypothesis sentence(s) as a string or list of strings
@@ -46,7 +57,7 @@ def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=se
     if distance_method not in accepted_distance_methods:
         raise Exception('Unknown distance method: {}. Please select one of {}'.format(distance_method, ', '.join(accepted_distance_methods)))
 
-    if len(known_compounds) == 0:
+    if len(known_compounds) == 0 and check_compounding:
         known_compounds = _read_compound_list()
     
     # put strings in a list so they'll safely work for the following for loop
@@ -91,8 +102,17 @@ def compute_mistakes(reference, hypothesis, utterance_ids=[], known_compounds=se
 
         # now take the edit operations and adjust the utterances to they align (e.g. add spaces where there was an insertion or deletion)
         changes_tuples, index_changes, ref, hyp = get_alignment_words(ref, hyp, computed_editops)
-        # now check if we have any compound words that have been created or deleted
-        ref, hyp, changes_tuples, index_changes, created_compound, brokeup_compound, join_in_created_compound, join_in_broken_compound = check_word_compounding(ref, hyp, changes_tuples)
+        if check_compounding:
+            # now check if we have any compound words that have been created or deleted
+            ref, hyp, changes_tuples, index_changes, created_compound, brokeup_compound, join_in_created_compound, join_in_broken_compound = check_word_compounding(ref, hyp, changes_tuples)
+        else:
+            # make sure we have values here to not break the code later
+            created_compound = 0
+            brokeup_compound = 0 
+            join_in_created_compound = 0
+            join_in_broken_compound = 0
+            
+
 
         word_align = print_alignment_words(ref, hyp, language, index_changes=index_changes, only_print_subs=False, do_print=False)
 
