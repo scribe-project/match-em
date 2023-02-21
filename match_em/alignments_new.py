@@ -2,7 +2,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from distutils.command import clean
 
-from .distances import distance
+# from .distances import distance
 import Levenshtein
 import re
 
@@ -22,8 +22,8 @@ def fix_del_ins_series(ref, hyp, change_tuples):
             next_tup = change_tuples[i+1]
             if next_tup[1] == ' ' and abs(change_tup[2] - next_tup[2]) == 1:
                 # update the ref and hyp
-                ref.pop(change_tup[2])
-                hyp.pop(next_tup[2])
+                hyp.pop(change_tup[2])
+                ref.pop(next_tup[2])
                 # do the combine!
                 change_tuples[i] = (
                     next_tup[0],

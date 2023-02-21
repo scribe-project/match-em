@@ -56,6 +56,18 @@ class AlignmentsTests(unittest.TestCase):
         )
         self.assertTrue(final_prints_the_same(expected_prints[6], results['final_print'])) 
 
+    def test_regression_7(self):
+        ref = 'auspico che expo duemilaquindici riesca ad accendere una riflessione permanente su queste tematiche e a spingere le istituzioni nazionali ed europee a prendere misure concrete al riguardo'
+        hyp = "altigo che espo duemille quindici riesca ad accendere una riflessione permanente su queste tematiche e a spingere le istituzioni nazionali d'europee a prendere misure con crete al riguardo"
+        results = analysis.compute_mistakes(
+            ref, 
+            hyp, 
+            distance_method='weighted_manual',
+            allow_greater_than_1_sub_cost=True,
+            language='it'
+        )
+        self.assertTrue(final_prints_the_same(expected_prints[7], results['final_print'])) 
+        
 
 expected_prints = {
     1: '''--- UNK_ID (WER: 60.0, compounds created: 1, compounds broken up: 0)---
@@ -86,7 +98,12 @@ expected_prints = {
   c | o | m | e    ||     |   | f | l | e | x |   | b | o | x    ||  e  ||  animazioni  ||     |      ||        ||     | c |   | s | s |      || 
     |   |   |      ||   m | e | f | l | e | x |   | b | o | x    ||  e  ||  animazioni  ||   c | i    ||   è    ||   s | t | e | r | s | e    || 
   D | D | D | D    ||   I | I |   |   |   |   | I |   |   |      ||     ||              ||   I | I    ||   I    ||   I | S | I | S |   | I    ||
-'''
+''',
+    7:'''
+--- UNK_ID (WER: 22.22, compounds created: 0, compounds broken up: 2)---
+  a | u | s | p | i | c | o    ||  che  ||   e | x | p | o    ||   d | u | e | m | i | l |   | a |   | q | u | i | n | d | i | c | i    ||  riesca  ||  ad  ||  accendere  ||  una  ||  riflessione  ||  permanente  ||  su  ||  queste  ||  tematiche  ||  e  ||  a  ||  spingere  ||  le  ||  istituzioni  ||  nazionali  ||   e | d    ||     |   | e | u | r | o | p | e | e    ||  a  ||  prendere  ||  misure  ||   c | o | n |   | c | r | e | t | e    ||  al  ||  riguardo  || 
+  a |   | l | t | i | g | o    ||  che  ||   e | s | p | o    ||   d | u | e | m | i | l | l | e |   | q | u | i | n | d | i | c | i    ||  riesca  ||  ad  ||  accendere  ||  una  ||  riflessione  ||  permanente  ||  su  ||  queste  ||  tematiche  ||  e  ||  a  ||  spingere  ||  le  ||  istituzioni  ||  nazionali  ||     |      ||   d | ' | e | u | r | o | p | e | e    ||  a  ||  prendere  ||  misure  ||   c | o | n |   | c | r | e | t | e    ||  al  ||  riguardo  || 
+    | D | S | S |   | S |      ||       ||     | S |   |      ||     |   |   |   |   |   | I | S | I |   |   |   |   |   |   |   |      ||          ||      ||             ||       ||               ||              ||      ||          ||             ||     ||     ||            ||      ||               ||             ||   D | D    ||   I | I |   |   |   |   |   |   |      ||     ||            ||          ||     |   |   | I |   |   |   |   |      ||      ||            || '''
 }
 
 def final_prints_the_same(truth, test_result):
@@ -96,8 +113,8 @@ def final_prints_the_same(truth, test_result):
     if truth_lines != test_lines:
         for i in range(len(truth_lines)):
             if truth_lines[i] != test_lines[i]:
-                print("This one (test)->{}<-".format(test_lines[i]))
-                print('v.s. (truth)->{}<-'.format(truth_lines[i]))
+                print("\nThis one (test)->{}<-".format(test_lines[i]))
+                print('\nv.s. (truth)->{}<-'.format(truth_lines[i]))
         import os
         debug_temp = '/localhome/stipendiater/plparson/match-em/tests/debug_temp.txt'
         open_method = 'w'
