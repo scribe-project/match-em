@@ -83,10 +83,10 @@ def get_character_sub_cost(char1, char2, language):
             return 0
     else:
         # we'll slightly lower the cost of subbing a vowel and approximant since they're gestually similar 
-        if char2_type == 'vowels' and (char1_type == 'consonants' and char1_vector[1] == 3):
+        if char2_type == 'vowels' and (char1_type == 'consonants' and char1_vector[1] == 4):
             # i just chose this number. idk if it's "right"
             return 0.9
-        elif char1_type == 'vowels' and (char2_type == 'consonants' and char2_vector[1] == 3):
+        elif char1_type == 'vowels' and (char2_type == 'consonants' and char2_vector[1] == 4):
             return 0.9
         else:
             return 1
