@@ -1,6 +1,5 @@
 import unittest
-
-from match_em import analysis
+import match_em
 
 '''
 These are the tests that orignally lived in teh the wav2vec_wer_tester.ipynb file.
@@ -10,17 +9,17 @@ They are NOT unit tests persay, rather they're regression tests with expected re
 class AlignmentsTests(unittest.TestCase):
 
     def test_regression_1(self):
-        results = analysis.compute_mistakes('frå neste veke av vart altså', 'fra neste veka var altså')
+        results = match_em.analysis.compute_mistakes('frå neste veke av vart altså', 'fra neste veka var altså')
         self.assertTrue(final_prints_the_same(expected_prints[1], results['final_print']))  
 
     def test_regression_2(self):
-        results = analysis.compute_mistakes('frå neste veke av vart altså', 'fra neste veka var altså', distance_method='weighted_manual')
+        results = match_em.analysis.compute_mistakes('frå neste veke av vart altså', 'fra neste veka var altså', distance_method='weighted_manual')
         self.assertTrue(final_prints_the_same(expected_prints[2], results['final_print'])) 
 
     def test_regresstion_3(self):
         ref = 'men etter hvert så ble jeg vant lig det og ble vant til å være sammen med dyra nedi laben der og det var egentlig ganske trivelig'
         hyp = 'men eee etter hvert så ble det vanlig og ble vant til å være samme dyra ned i laben er og det var egentlig ganske trivelig'
-        results = analysis.compute_mistakes(ref, hyp, distance_method='weighted_manual')
+        results = match_em.analysis.compute_mistakes(ref, hyp, distance_method='weighted_manual')
         self.assertEqual(results['compounds_created'], 1)
         self.assertEqual(results['compounds_deleted'], 1)
         self.assertTrue(final_prints_the_same(expected_prints[3], results['final_print'])) 
@@ -29,14 +28,14 @@ class AlignmentsTests(unittest.TestCase):
         ref = 'da ble det nemlig slik at de spilte en en hjemme første kampen og så ble det to to da på ullevål'
         hyp = 'da var nemisikke spilt en ein heime i første kampen og så ble det to torer på ulleval'
         # specifically this is testing python-Levenshtein get_alignment_word() aka Issue 1
-        results = analysis.compute_mistakes(ref, hyp)
+        results = match_em.analysis.compute_mistakes(ref, hyp)
         self.assertTrue(final_prints_the_same(expected_prints[4], results['final_print'])) 
 
     def test_regression_5(self):
         ref = "DAIHATSU HøYNET SIN GUIDING onsdag".lower()
         hyp = 'DA HATSU HøYNETSINGUIDING onsdag'.lower()
         utt_id = ['p1_g01_f1_2_b0065']
-        results = analysis.compute_mistakes(
+        results = match_em.analysis.compute_mistakes(
             ref, 
             hyp, 
             utt_id, 
@@ -47,7 +46,7 @@ class AlignmentsTests(unittest.TestCase):
     def test_regression_6(self):
         ref = 'come flexbox e animazioni css'
         hyp = 'meflex box e animazioni ci è sterse'
-        results = analysis.compute_mistakes(
+        results = match_em.analysis.compute_mistakes(
             ref, 
             hyp, 
             distance_method='weighted_manual',
@@ -59,7 +58,7 @@ class AlignmentsTests(unittest.TestCase):
     def test_regression_7(self):
         ref = 'auspico che expo duemilaquindici riesca ad accendere una riflessione permanente su queste tematiche e a spingere le istituzioni nazionali ed europee a prendere misure concrete al riguardo'
         hyp = "altigo che espo duemille quindici riesca ad accendere una riflessione permanente su queste tematiche e a spingere le istituzioni nazionali d'europee a prendere misure con crete al riguardo"
-        results = analysis.compute_mistakes(
+        results = match_em.analysis.compute_mistakes(
             ref, 
             hyp, 
             distance_method='weighted_manual',
@@ -116,7 +115,7 @@ def final_prints_the_same(truth, test_result):
                 print("\nThis one (test)->{}<-".format(test_lines[i]))
                 print('\nv.s. (truth)->{}<-'.format(truth_lines[i]))
         import os
-        debug_temp = '/localhome/stipendiater/plparson/match-em/tests/debug_temp.txt'
+        debug_temp = '/localhome/stipendiater/plparson/match-em/match_em/tests/debug_temp.txt'
         open_method = 'w'
         if os.path.isfile(debug_temp):
             open_method = 'a'

@@ -6,6 +6,13 @@ from distutils.command import clean
 import Levenshtein
 import re
 
+shifting_to_index = {
+    "ref" : 0,
+    "hyp" : 1
+}
+
+spaces_pattern = re.compile("\s+")
+
 def update_change_tuples(change_tuples, index_greater_than, change_by=-1):
     change_by = int(change_by)
     return [(ct[0], ct[1], ct[2] + change_by if ct[2] > index_greater_than else ct[2]) for ct in change_tuples]
@@ -22,8 +29,8 @@ def fix_del_ins_series(ref, hyp, change_tuples):
             next_tup = change_tuples[i+1]
             if next_tup[1] == ' ' and abs(change_tup[2] - next_tup[2]) == 1:
                 # update the ref and hyp
-                hyp.pop(change_tup[2])
-                ref.pop(next_tup[2])
+                ref.pop(change_tup[2])
+                hyp.pop(next_tup[2])
                 # do the combine!
                 change_tuples[i] = (
                     next_tup[0],
@@ -49,14 +56,6 @@ def fix_del_ins_series(ref, hyp, change_tuples):
                 change_tuples = update_change_tuples(change_tuples, change_tup[2])
                 return(fix_del_ins_series(ref, hyp, change_tuples))
     return ref, hyp, change_tuples
-
-
-shifting_to_index = {
-    "ref" : 0,
-    "hyp" : 1
-}
-
-spaces_pattern = re.compile("\s+")
 
 def remove_spaces(word):
     return spaces_pattern.sub('', word)
@@ -187,7 +186,13 @@ def shift_right(token_lists, change_tuples, shifting):
                         new[shifting_to_index[shifting]] = ' '
                         new[get_shifting_opposite(shifting_to_index[shifting])] = change_tup[get_shifting_opposite(shifting_to_index[shifting])]
                         change_tuples[i] = tuple(new)
+                    # if shifting is hyp then all of the change_tuples are bascially backwards so we'll reverse here
+                    if shifting_to_index[shifting]:
+                        change_tuples = [(tup[1], tup[0], tup[2]) for tup in change_tuples]
                     shifting_tokens, staying_tokens, change_tuples = fix_del_ins_series(shifting_tokens, staying_tokens, change_tuples)
+                    # now undo the reversing
+                    if shifting_to_index[shifting]:
+                        change_tuples = [(tup[1], tup[0], tup[2]) for tup in change_tuples]
                     new_token_list = ['', '']
                     new_token_list[shifting_to_index[shifting]] = shifting_tokens
                     new_token_list[get_shifting_opposite(shifting_to_index[shifting])] = staying_tokens

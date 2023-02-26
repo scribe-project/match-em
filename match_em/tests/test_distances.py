@@ -1,27 +1,27 @@
 import numpy as np
 import unittest
 
-from match_em import distances
+import match_em
 
 class AlignmentsTests(unittest.TestCase):
 
     def test_get_character_error_rate_one_sub(self):
-        cer = distances.get_character_error_rate('hello', 'hallo')
+        cer = match_em.distances.get_character_error_rate('hello', 'hallo')
         self.assertEqual(cer, 1/5)
     def test_get_character_error_rate_one_del(self):
-        cer = distances.get_character_error_rate('hello', 'hell')
+        cer = match_em.distances.get_character_error_rate('hello', 'hell')
         self.assertEqual(cer, 1/5)
     def test_get_character_error_rate_one_ins(self):
-        cer = distances.get_character_error_rate('hello', 'helloo')
+        cer = match_em.distances.get_character_error_rate('hello', 'helloo')
         self.assertEqual(cer, 1/5)
     def test_get_character_error_rate_all_sub(self):
-        cer = distances.get_character_error_rate('hello', 'shows')
+        cer = match_em.distances.get_character_error_rate('hello', 'shows')
         self.assertEqual(cer, 1)
     def test_get_character_error_rate_all_del(self):
-        cer = distances.get_character_error_rate('hello', '')
+        cer = match_em.distances.get_character_error_rate('hello', '')
         self.assertEqual(cer, 1)
     def test_get_character_error_rate_all_ins(self):
-        cer = distances.get_character_error_rate('', 'hallo')
+        cer = match_em.distances.get_character_error_rate('', 'hallo')
         self.assertEqual(cer, 0)
 
     def test_get_sub_cost_greater_than_1(self):
@@ -29,36 +29,36 @@ class AlignmentsTests(unittest.TestCase):
         Testing the substitution cost when the CER should be > 1
         NOTE: the current expected behaviour for CER > 1 is to return 1. If that changes this test needs to be updated
         '''
-        cost = distances.get_sub_cost('test', 'calibration')
+        cost = match_em.distances.get_sub_cost('test', 'calibration')
         self.assertEqual(cost, 1)
     def test_get_sub_cost_less_than_1(self):
         '''
         Testing the substitution cost when the CER should be < 1. Expectation is that the CER is returned
         '''
-        cost = distances.get_sub_cost('test', 'tests')
+        cost = match_em.distances.get_sub_cost('test', 'tests')
         self.assertEqual(cost, 1/4)
 
     def test_paths_not_ending_at_zero_no_paths(self):
-        end_in_zero = distances.paths_not_ending_at_zero([])
+        end_in_zero = match_em.distances.paths_not_ending_at_zero([])
         self.assertEqual(end_in_zero, True)
     def test_paths_not_ending_at_zero_one_path_not_zero(self):
-        end_in_zero = distances.paths_not_ending_at_zero([[(1,1), (0,0)]])
+        end_in_zero = match_em.distances.paths_not_ending_at_zero([[(1,1), (0,0)]])
         self.assertEqual(end_in_zero, True)
     def test_paths_not_ending_at_zero_one_path_yes_zero(self):
-        end_in_zero = distances.paths_not_ending_at_zero([[(1,1), (0,0), 0]])
+        end_in_zero = match_em.distances.paths_not_ending_at_zero([[(1,1), (0,0), 0]])
         self.assertEqual(end_in_zero, False)
     def test_paths_not_ending_at_zero_many_path_one_yes_zero(self):
-        end_in_zero = distances.paths_not_ending_at_zero([[(1,1), (0,0), 0], [(1,1), (0,0)]])
+        end_in_zero = match_em.distances.paths_not_ending_at_zero([[(1,1), (0,0), 0], [(1,1), (0,0)]])
         self.assertEqual(end_in_zero, True)
     def test_paths_not_ending_at_zero_many_path_all_yes_zero(self):
-        end_in_zero = distances.paths_not_ending_at_zero([[(1,1), (0,0), 0], [(1,1), (0,0), 0]])
+        end_in_zero = match_em.distances.paths_not_ending_at_zero([[(1,1), (0,0), 0], [(1,1), (0,0), 0]])
         self.assertEqual(end_in_zero, False)
     def test_paths_not_ending_at_zero_many_path_all_not_zero(self):
-        end_in_zero = distances.paths_not_ending_at_zero([[(1,1), (0,0)], [(1,1), (0,0)]])
+        end_in_zero = match_em.distances.paths_not_ending_at_zero([[(1,1), (0,0)], [(1,1), (0,0)]])
         self.assertEqual(end_in_zero, True)
 
     def test_trim_candiate_list_needs_trim(self):
-        paths = distances.trim_candiate_list(
+        paths = match_em.distances.trim_candiate_list(
             [
                 (1,2,3),
                 (4,5,6),
@@ -70,7 +70,7 @@ class AlignmentsTests(unittest.TestCase):
         , 5)
         self.assertEqual(len(paths), 5)
     def test_trim_candiate_list_doesntneed_trim(self):
-        paths = distances.trim_candiate_list(
+        paths = match_em.distances.trim_candiate_list(
             [
                 (1,2,3),
                 (4,5,6),
@@ -81,7 +81,7 @@ class AlignmentsTests(unittest.TestCase):
         self.assertEqual(len(paths), 4)
 
     def test_generate_matrix(self):
-        dist = distances.distance('this is a test', 'a test this is')
+        dist = match_em.distances.distance('this is a test', 'a test this is', language='no')
         dist.generate_matrixes()
         distance_matrix = np.array([
             [0, 1, 2, 3, 4],
@@ -115,7 +115,7 @@ class AlignmentsTests(unittest.TestCase):
     #     self.assertEqual(backtrace_array, dist.backtrace_array)
 
     def test_compute_unweighed_alignment(self):
-        dist = distances.distance('the red cat', 'the rad')
+        dist = match_em.distances.distance('the red cat', 'the rad', language='no')
         dist.compute_unweighted_alignment()
         distance_matrix = np.array(
             [
@@ -136,7 +136,7 @@ class AlignmentsTests(unittest.TestCase):
         self.assertEqual(backtrace_array, dist.backtrace_array)
 
     def test_get_weighted_character_editops(self):
-        char_edit_ops = distances.distance('perler', 'pæler').get_weighted_character_editops() # dist.get_weighted_character_editops()
+        char_edit_ops = match_em.distances.distance('perler', 'pæler', language='no').get_weighted_character_editops() # dist.get_weighted_character_editops()
         # print(char_edit_ops)
         self.assertEqual(char_edit_ops[0], ('sub', 1, 1))
         self.assertEqual(char_edit_ops[1], ('delete', 2, 1))

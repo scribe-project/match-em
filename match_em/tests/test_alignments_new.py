@@ -1,11 +1,11 @@
 import unittest
-import match_em.alignments_new as alignments
+import match_em
 
 class AlignmentsNewTests(unittest.TestCase):
     
     def test_change_tuples_update_minus_1(self):
         change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
-        res = alignments.update_change_tuples(
+        res = match_em.alignments_new.update_change_tuples(
             change_tuples,
             5
         )
@@ -16,7 +16,7 @@ class AlignmentsNewTests(unittest.TestCase):
 
     def test_change_tuples_update_plus_1(self):
         change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
-        res = alignments.update_change_tuples(
+        res = match_em.alignments_new.update_change_tuples(
             change_tuples,
             5,
             1
@@ -28,7 +28,7 @@ class AlignmentsNewTests(unittest.TestCase):
 
     def test_change_tuples_ct_index_update_minus_1(self):
         change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
-        res = alignments.update_change_tuples_ct_index(
+        res = match_em.alignments_new.update_change_tuples_ct_index(
             change_tuples,
             5
         )
@@ -39,7 +39,7 @@ class AlignmentsNewTests(unittest.TestCase):
 
     def test_change_tuples_ct_index_update_plus_1(self):
         change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
-        res = alignments.update_change_tuples_ct_index(
+        res = match_em.alignments_new.update_change_tuples_ct_index(
             change_tuples,
             5,
             1
@@ -53,7 +53,7 @@ class AlignmentsNewTests(unittest.TestCase):
         ref = ['this', 'is', ' ', 'test']
         hyp = ['this', ' ' , 'a', 'test']
         change_tuples = [('is', ' ', 1), (' ', 'a', 2)]
-        new_ref, new_hyp, new_changes = alignments.fix_del_ins_series(ref, hyp, change_tuples)
+        new_ref, new_hyp, new_changes = match_em.alignments_new.fix_del_ins_series(ref, hyp, change_tuples)
         self.assertEqual(
             new_ref,
             ['this', 'is', 'test']
@@ -71,7 +71,11 @@ class AlignmentsNewTests(unittest.TestCase):
         ref = ['this', ' ' , 'a', 'test']
         hyp = ['this', 'is', ' ', 'test']
         change_tuples = [(' ', 'is', 1), ('a', ' ', 2)]
-        new_ref, new_hyp, new_changes = alignments.fix_del_ins_series(ref, hyp, change_tuples)
+        new_ref, new_hyp, new_changes = match_em.alignments_new.fix_del_ins_series(
+            ref, 
+            hyp, 
+            change_tuples
+        )
         self.assertEqual(
             new_ref,
             ['this', 'a', 'test']
@@ -84,12 +88,12 @@ class AlignmentsNewTests(unittest.TestCase):
             new_changes,
             [('a', 'is', 1)]
         )
-
+        
     def test_del_ins_series_multi(self):
         ref = ['this', 'is', ' ', 'test', 'of', ' '  , 'nice', 'system']
         hyp = ['this', ' ' , 'a', 'test', 'of', 'the', ' '  , 'system']
         change_tuples = [('is', ' ', 1), (' ', 'a', 2), (' ', 'the', 5), ('nice', ' ', 6)]
-        new_ref, new_hyp, new_changes = alignments.fix_del_ins_series(ref, hyp, change_tuples)
+        new_ref, new_hyp, new_changes = match_em.alignments_new.fix_del_ins_series(ref, hyp, change_tuples)
         self.assertEqual(
             new_ref,
             ['this', 'is', 'test', 'of', 'nice', 'system']
@@ -107,7 +111,7 @@ class AlignmentsNewTests(unittest.TestCase):
         ref = ['this', 'is', 'a', ' '   , 'of', ' '  , 'nice', 'system']
         hyp = ['this', ' ' , 'a', 'test', 'of', 'the', ' '  , 'system']
         change_tuples = [('is', ' ', 1), (' ', 'test', 3), (' ', 'the', 5), ('nice', ' ', 6)]
-        new_ref, new_hyp, new_changes = alignments.fix_del_ins_series(ref, hyp, change_tuples)
+        new_ref, new_hyp, new_changes = match_em.alignments_new.fix_del_ins_series(ref, hyp, change_tuples)
         self.assertEqual(
             new_ref,
             ['this', 'is', 'a', ' ', 'of', 'nice', 'system']
@@ -124,11 +128,11 @@ class AlignmentsNewTests(unittest.TestCase):
     def test_remove_spaces(self):
         self.assertEqual(
             'yehaw',
-            alignments.remove_spaces('ye haw  ')
+            match_em.alignments_new.remove_spaces('ye haw  ')
         )
 
     def test_shift_left_ref(self):
-        res_tokens, change_tups, shifting = alignments.shift_left(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_left(
             [
                 ['she', 'carried', 'a', 'heavy', 'back'    , 'pack'],
                 ['she', 'carried', 'a', 'heavy', 'backpack', ' '   ],
@@ -150,7 +154,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_left_ref_eee(self):
-        res_tokens, change_tups, shifting = alignments.shift_left(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_left(
             [
                 ['she', 'carried', 'a', 'heavy', 'back'    , 'pack'],
                 ['she', 'carried', 'a', 'heavy', 'backpack', 'eee' ],
@@ -172,7 +176,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_left_ref_multi(self):
-        res_tokens, change_tups, shifting = alignments.shift_left(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_left(
             [
                 ['she', 'carried', 'a', 'heavy', 'back'    , 'pack', 'and', 'a', 'white'     , 'board'],
                 ['she', 'carried', 'a', 'heavy', 'backpack', ' '   , 'and', 'a', 'whiteboard', ' '    ],
@@ -194,7 +198,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_left_hyp(self):
-        res_tokens, change_tups, shifting = alignments.shift_left(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_left(
             [
                 ['she', 'carried', 'a', 'heavy', 'backpack', ' '   ],
                 ['she', 'carried', 'a', 'heavy', 'back'    , 'pack']
@@ -216,7 +220,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_left_hyp_multi(self):
-        res_tokens, change_tups, shifting = alignments.shift_left(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_left(
             [
                 ['she', 'carried', 'a', 'heavy', 'backpack', ' '   , 'and', 'a', 'whiteboard', ' '    ],
                 ['she', 'carried', 'a', 'heavy', 'back'    , 'pack', 'and', 'a', 'white'     , 'board'],
@@ -239,7 +243,7 @@ class AlignmentsNewTests(unittest.TestCase):
 
     ################ SHIFT RIGHT ###############################
     def test_shift_right_ref(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    ],
                 ['she', 'carried', 'a', 'heavy', ' '   , 'backpack'],
@@ -261,7 +265,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_right_ref_eee(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    ],
                 ['she', 'carried', 'a', 'heavy', 'eee' , 'backpack'],
@@ -283,7 +287,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_right_ref_multi(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    , 'and', 'a', 'white', 'board'],
                 ['she', 'carried', 'a', 'heavy', ' '   , 'backpack', 'and', 'a', ' '    , 'whiteboard'],
@@ -305,7 +309,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
     
     def test_shift_right_ref_multi_eee(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    , 'and', 'a', 'white', 'board'],
                 ['she', 'carried', 'a', 'heavy', ' '   , 'backpack', 'and', 'a', 'eee'  , 'whiteboard'],
@@ -327,7 +331,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_right_hyp(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', ' '   , 'backpack'],
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    ]
@@ -349,7 +353,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_right_hyp_eee(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', 'eee' , 'backpack'],
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    ]
@@ -371,7 +375,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_right_hyp_multi(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', ' '   , 'backpack', 'and', 'a', ' '    , 'whiteboard'],
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    , 'and', 'a', 'white', 'board'     ],
@@ -393,7 +397,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_shift_right_hyp_multi_eee(self):
-        res_tokens, change_tups, shifting = alignments.shift_right(
+        res_tokens, change_tups, shifting = match_em.alignments_new.shift_right(
             [
                 ['she', 'carried', 'a', 'heavy', ' '   , 'backpack', 'and', 'a', 'eee'  , 'whiteboard'],
                 ['she', 'carried', 'a', 'heavy', 'back', 'pack'    , 'and', 'a', 'white', 'board'     ],
@@ -415,7 +419,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_check_word_compounding(self):
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ['she', 'carried', 'a', 'heavy', 'backpack', ' '   , 'and', 'a', 'eee'  , 'whiteboard'],
             ['she', 'carried', 'a', 'heavy', 'back'    , 'pack', 'and', 'a', 'white', 'board'     ],
             [('backpack', 'back',  4), (' ', 'pack',  5), ('eee', 'white', 8), ('whiteboard', 'board', 9)],
@@ -434,7 +438,7 @@ class AlignmentsNewTests(unittest.TestCase):
         )
 
     def test_count_compounds(self):
-        created_count, broken_count, created_joins, broken_joins = alignments.count_compounds_created_broken(
+        created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.count_compounds_created_broken(
             [
                 ('to tusen og ti', 'totusenogti', 3),
                 ('forløses', 'for løse', 4), 
@@ -466,7 +470,7 @@ class AlignmentsNewTests(unittest.TestCase):
         ref = ['nei', 'er det', 'barneserie']
         hyp = ['nei', ' ', 'barnet serie']
         change_tuples = [('er det', ' ', 1), ('barneserie', 'barnet serie', 2)]
-        ref, hyp, change_tuples = alignments.undo_unnecessary_compounding(ref, hyp, change_tuples)
+        ref, hyp, change_tuples = match_em.alignments_new.undo_unnecessary_compounding(ref, hyp, change_tuples)
         self.assertEqual(
             ref,
             ['nei', 'er', 'det', 'barneserie']
@@ -485,7 +489,7 @@ class AlignmentsNewTests(unittest.TestCase):
         ref = ['nei', 'er det en', 'barneserie']
         hyp = ['nei', ' ', 'barnet serie']
         change_tuples = [('er det en', ' ', 1), ('barneserie', 'barnet serie', 2)]
-        ref, hyp, change_tuples = alignments.undo_unnecessary_compounding(ref, hyp, change_tuples)
+        ref, hyp, change_tuples = match_em.alignments_new.undo_unnecessary_compounding(ref, hyp, change_tuples)
         self.assertEqual(
             ref,
             ['nei', 'er', 'det', 'en', 'barneserie']
@@ -504,7 +508,7 @@ class AlignmentsNewTests(unittest.TestCase):
         ref = ['nei', ' ', 'barnet serie']
         hyp = ['nei', 'er det en', 'barneserie']
         change_tuples = [(' ', 'er det en', 1), ('barnet serie', 'barneserie', 2)]
-        ref, hyp, change_tuples = alignments.undo_unnecessary_compounding(ref, hyp, change_tuples)
+        ref, hyp, change_tuples = match_em.alignments_new.undo_unnecessary_compounding(ref, hyp, change_tuples)
         self.assertEqual(
             ref,
             ['nei', ' ', ' ', ' ', 'barnet serie']
@@ -522,7 +526,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
         ref = ['fredag', 'tjuefjerde', 'september', 'to', 'tusen',       'og',  'ti', 'forløses', 'ei', 'lita',  ' ', 'jente', 'ved', 'nødkeisersnitt']
         hyp = ['fredag', 'tjuefjerde', 'september', ' ',  'totusenogti', 'for', ' ',    'løse',   'seg', 'lite', 'av', 'jenter', 'ved', 'nødkaisersnitt']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -568,7 +572,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('daihatsu', 'da', 0), ('høynet', 'hatsu', 1), ('sin', 'høynetsinguiding', 2), ('guiding', ' ', 3)]
         ref = ['daihatsu', 'høynet', 'sin', 'guiding', 'onsdag']
         hyp = ['da', 'hatsu', 'høynetsinguiding', ' ', 'onsdag']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -609,7 +613,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('av', 'har', 1), ('hjortane', 'gjort', 2), (' ', 'den', 3), ('er', 'her', 4), ('daude', 'daue', 5), ('vart', 'ble', 8)]
         ref = ['to', 'av', 'hjortane', ' ', 'er', 'daude', 'og', 'det', 'vart', 'onsdag', 'kveld', 'gjennomført', 'søk', 'etter', 'den', 'tredje']
         hyp = ['to', 'har', 'gjort', 'den', 'her', 'daue', 'og', 'det', 'ble', 'onsdag', 'kveld', 'gjennomført', 'søk', 'etter', 'den', 'tredje']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -647,7 +651,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [(' ', 'totusenogto', 1), ('to', 'ble', 2), ('tusen', 'den', 3), ('og', 'nå', 4), ('to', ' ', 5), ('ble', ' ', 6), ('nguyen', 'igjen', 7), ('singapore', 'singapor', 14)]
         ref = ['i', ' '          , 'to', 'tusen', 'og', 'to', 'ble', 'nguyen', 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapore', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
         hyp = ['i', 'totusenogto', 'ble', 'den' , 'nå', ' ' , ' '  , 'igjen' , 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapor' , 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -685,7 +689,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('totusenogto', ' ', 1), ('ble', 'to', 2), ('den', 'tusen', 3), ('nå', 'og', 4), (' ', 'to', 5), (' ', 'ble', 6), ('igjen', 'nguyen', 7), ('singapor', 'singapore', 14)]
         ref = ['i', 'totusenogto', 'ble', 'den' , 'nå', ' ' , ' '  , 'igjen' , 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapor' , 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
         hyp = ['i', ' '          , 'to', 'tusen', 'og', 'to', 'ble', 'nguyen', 'tatt', 'på', 'den', 'internasjonale', 'flyplassen', 'i', 'singapore', 'med', 'tre', 'hundre', 'og', 'nittiseks', 'gram', 'heroin']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -723,7 +727,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('ø', ' ', 1), ('også', 'oss', 3), ('ærlig', ' ', 4), ('at', 'av', 5), (' ', 'ærlighet', 6), ('troféløse', 'trofelesesesong', 8), ('sesong', ' ', 9)]
         ref = ['don', 'ø', 'innrømmer', 'også', 'ærlig', 'at', ' '       , 'fjorårets', 'troféløse',     'sesong', 'var', 'en', 'dyp', 'skuffelse']
         hyp = ['don', ' ', 'innrømmer', 'oss' , '     ', 'av', 'ærlighet', 'fjorårets', 'trofelesesesong', ' '   , 'var', 'en', 'dyp', 'skuffelse']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -761,7 +765,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('don', ' ', 0), ('ærlig', 'ærlighet', 4), ('at', ' ', 5), ('fjorårets', 'fjor', 6), ('troféløse', 'er', 7), ('sesong', 'et', 8), (' ', 'trofelesesesong', 9)]
         ref = ['don', 'ø', 'innrømmer', 'også', 'ærlig'   , 'at', 'fjorårets', 'troféløse', 'sesong', ' '              , 'var', 'en', 'dyp', 'skuffelse']
         hyp = [' '  , 'ø', 'innrømmer', 'også', 'ærlighet', ' ' , 'fjor'     , 'er'       , 'et'    , 'trofelesesesong', 'var', 'en', 'dyp', 'skuffelse']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -800,7 +804,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('actionspill', 'aktion', 14), (' ', 'spill', 15)]
         ref = ['men', 'uansett', 'om', 'man', 'mener', 'detaljgraden', 'er', 'spekulativ', 'eller', 'ikke', 'er', 'dette', 'et', 'bra', 'actionspill', ' ']
         hyp = ['men', 'uansett', 'om', 'man', 'mener', 'detaljgraden', 'er', 'spekulativ', 'eller', 'ikke', 'er', 'dette', 'et', 'bra', 'aktion', 'spill']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -839,7 +843,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('sergej', 'sergei', 0), ('bubka', 'bobka', 1), (' ', 'nyleder', 3), (' ', 'for', 4), ('ny', 'io', 5), ('leder', 'sas', 6), (' ', 'oto', 7), ('iocs', 'komi', 9), ('utøverkommisjon', 'kjønn', 10)]
         ref = ['sergej', 'bubka', 'er', ' '      , ' '  , 'ny', 'leder', ' '  , 'for', 'iocs', 'utøverkommisjon']
         hyp = ['sergei', 'bobka', 'er', 'nyleder', 'for', 'io', 'sas'  , 'oto', 'for', 'komi', 'kjønn'          ]
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
@@ -888,7 +892,7 @@ class AlignmentsNewTests(unittest.TestCase):
         change_tuples = [('er', ' ', 1), ('det', 'barnet', 2), ('barneserie', 'serie', 3)]
         ref = ['nei', 'er', 'det', 'barneserie']
         hyp = ['nei', ' ', 'barnet', 'serie']
-        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = alignments.check_word_compounding(
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
             ref,
             hyp,
             change_tuples
