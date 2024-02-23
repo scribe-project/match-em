@@ -8,7 +8,7 @@ The goal of this package is to extend/modify word alignment and error calculatio
 - [Implementation details](#implementation-details)
   - [Reading generated alignments](#reading-generated-alignments)
   - [Distance calculation methods](#calculating-distance-and-backtrace)
-  - [Character vectors](#character_vectors)
+  - [Character vectors](#character-vectors)
   - [Compounding](#compounding)
   - [Greater than 1 substitution cost](#greater-than-1-dynamic-substitution-cost)
 - [Usage](#usage)
