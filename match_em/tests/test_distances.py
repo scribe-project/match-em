@@ -2,6 +2,7 @@ import numpy as np
 import unittest
 
 import match_em
+from match_em.character_distances import character_distances
 
 class AlignmentsTests(unittest.TestCase):
 
@@ -81,7 +82,7 @@ class AlignmentsTests(unittest.TestCase):
         self.assertEqual(len(paths), 4)
 
     def test_generate_matrix(self):
-        dist = match_em.distances.distance('this is a test', 'a test this is', language='no')
+        dist = match_em.distances.distance('this is a test', 'a test this is', character_distances('no'))
         dist.generate_matrixes()
         distance_matrix = np.array([
             [0, 1, 2, 3, 4],
@@ -115,7 +116,7 @@ class AlignmentsTests(unittest.TestCase):
     #     self.assertEqual(backtrace_array, dist.backtrace_array)
 
     def test_compute_unweighed_alignment(self):
-        dist = match_em.distances.distance('the red cat', 'the rad', language='no')
+        dist = match_em.distances.distance('the red cat', 'the rad', character_distances('no'))
         dist.compute_unweighted_alignment()
         distance_matrix = np.array(
             [
@@ -136,7 +137,7 @@ class AlignmentsTests(unittest.TestCase):
         self.assertEqual(backtrace_array, dist.backtrace_array)
 
     def test_get_weighted_character_editops(self):
-        char_edit_ops = match_em.distances.distance('perler', 'pæler', language='no').get_weighted_character_editops() # dist.get_weighted_character_editops()
+        char_edit_ops = match_em.distances.distance('perler', 'pæler', character_distances('no')).get_weighted_character_editops() # dist.get_weighted_character_editops()
         # print(char_edit_ops)
         self.assertEqual(char_edit_ops[0], ('sub', 1, 1))
         self.assertEqual(char_edit_ops[1], ('delete', 2, 1))

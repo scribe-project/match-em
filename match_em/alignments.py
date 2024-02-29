@@ -13,29 +13,6 @@ def string_insert(string, index, insert_me):
     return string[:index] + insert_me + string[index:]
 
 def get_alignment_chars(ref, hyp, ops):
-    # ref_index_adjustment = 0
-    # hyp_index_adjustment = 0
-    # index_changes = {}
-    # changes_tuples = []
-    # for op in ops:
-    #     if op[0] == 'insert':
-    #         ref = ref[:op[1] + ref_index_adjustment] + ' ' + ref[op[1] + ref_index_adjustment:]
-    #         index_changes[op[1] + ref_index_adjustment] = 'I'
-    #         hyp_insert = hyp[op[2] + hyp_index_adjustment]
-    #         if hyp_insert not in ignore_chars and hyp_insert != ' ':
-    #             changes_tuples.append((' ', hyp_insert))
-    #         ref_index_adjustment += 1
-    #     elif op[0] == 'delete':
-    #         hyp = hyp[:op[2] + hyp_index_adjustment] + ' ' + hyp[op[2] + hyp_index_adjustment:]
-    #         index_changes[op[2] + hyp_index_adjustment] = 'D'
-    #         ref_del = ref[op[1] + ref_index_adjustment]
-    #         if ref_del not in ignore_chars and ref_del != ' ':
-    #             changes_tuples.append((ref_del, ' '))
-    #         hyp_index_adjustment += 1
-    #     else:
-    #         index_changes[max(op[1], op[2])] = 'S'
-    #         changes_tuples.append((ref[op[1] + ref_index_adjustment], hyp[op[2] + hyp_index_adjustment]))
-    # return changes_tuples, index_changes, ref, hyp
 
     ref_index_adjustment = 0
     hyp_index_adjustment = 0
@@ -164,7 +141,7 @@ def print_alignment_chars(ref, hyp, ops, do_print=True, max_width=250, only_prin
             print()
     return ref_print_str, hyp_print_str, chg_print_str
 
-def print_alignment_words(ref, hyp, language, index_changes={}, do_print=False, print_char_alignments=True, only_print_subs=False, max_width=250):
+def print_alignment_words(ref, hyp, char_dists, index_changes={}, do_print=False, print_char_alignments=True, only_print_subs=False, max_width=250):
     ref = deepcopy(ref)
     hyp = deepcopy(hyp)
 
@@ -211,7 +188,7 @@ def print_alignment_words(ref, hyp, language, index_changes={}, do_print=False, 
                         #     ref[i] if ref[i] != ' ' else '', 
                         #     hyp[i] if hyp[i] != ' ' else ''
                         # ),
-                        distance(use_ref, use_hyp, language).get_weighted_character_editops(),
+                        distance(use_ref, use_hyp, char_dists).get_weighted_character_editops(),
                         do_print=False, 
                         only_print_subs=True
                     )
@@ -236,7 +213,7 @@ def print_alignment_words(ref, hyp, language, index_changes={}, do_print=False, 
                         #     ref[i] if ref[i] != ' ' else '', 
                         #     hyp[i] if hyp[i] != ' ' else ''
                         # ),
-                        distance(use_ref, use_hyp, language).get_weighted_character_editops(),
+                        distance(use_ref, use_hyp, char_dists).get_weighted_character_editops(),
                         do_print=False, 
                         only_print_subs=False
                     )
@@ -280,19 +257,19 @@ def print_alignment_words(ref, hyp, language, index_changes={}, do_print=False, 
 
     return(ref_print_str, hyp_print_str, chg_print_str)
 
-def get_character_del_count(ref, hyp, language):
+def get_character_del_count(ref, hyp, char_dists):
     # return len([edtop for edtop in Levenshtein.editops(ref, hyp) if edtop[0] == 'delete'])
-    return len([edtop for edtop in distance(ref, hyp, language).get_weighted_character_editops() if edtop[0] == 'delete'])
+    return len([edtop for edtop in distance(ref, hyp, char_dists).get_weighted_character_editops() if edtop[0] == 'delete'])
 
-def get_character_ins_count(ref, hyp, language):
+def get_character_ins_count(ref, hyp, char_dists):
     # return len([edtop for edtop in Levenshtein.editops(ref, hyp) if edtop[0] == 'insert'])
-    return len([edtop for edtop in distance(ref, hyp, language).get_weighted_character_editops() if edtop[0] == 'insert'])
+    return len([edtop for edtop in distance(ref, hyp, char_dists).get_weighted_character_editops() if edtop[0] == 'insert'])
 
-def get_character_change_count(ref, hyp, language):
+def get_character_change_count(ref, hyp, char_dists):
     # return len([edtop for edtop in Levenshtein.editops(ref, hyp)])
-    return len([edtop for edtop in distance(ref, hyp, language).get_weighted_character_editops()])
+    return len([edtop for edtop in distance(ref, hyp, char_dists).get_weighted_character_editops()])
 
-def check_word_compounding(changes_tuples, index_changes, ref, hyp, language):
+def check_word_compounding(changes_tuples, index_changes, ref, hyp, char_dists):
     created_compound=0
     brokeup_compound=0
     i = 0
@@ -317,21 +294,21 @@ def check_word_compounding(changes_tuples, index_changes, ref, hyp, language):
             # ||       ||     |   |      ||  D | D | D |   |   |    ||
             if change_index - 1 >= 0 and hyp[change_index-1] not in ['', ' ']:
                 # left_base_cer = get_character_error_rate(ref[change_index-1], hyp[change_index-1])
-                left_base_del_count = get_character_del_count(ref[change_index-1], hyp[change_index-1], language)
+                left_base_del_count = get_character_del_count(ref[change_index-1], hyp[change_index-1], char_dists)
                 # left_compound_cer = get_character_error_rate(ref[change_index-1], hyp[change_index-1] + change_tup[0])
-                left_compound_del_count = get_character_del_count(ref[change_index-1], hyp[change_index-1] + change_tup[1], language)
+                left_compound_del_count = get_character_del_count(ref[change_index-1], hyp[change_index-1] + change_tup[1], char_dists)
 
                 left_base_edit_count = get_character_change_count(ref[change_index-1], hyp[change_index-1])
-                left_compound_edit_count = get_character_change_count(ref[change_index-1], hyp[change_index-1] + change_tup[1], language)
+                left_compound_edit_count = get_character_change_count(ref[change_index-1], hyp[change_index-1] + change_tup[1], char_dists)
 
             if change_index + 1 < len(ref) and hyp[change_index+1] not in ['', ' ']:
                 # right_base_cer = get_character_error_rate(ref[change_index+1], hyp[change_index+1])
-                right_base_del_count = get_character_del_count(ref[change_index+1], hyp[change_index+1], language)
+                right_base_del_count = get_character_del_count(ref[change_index+1], hyp[change_index+1], char_dists)
                 # right_compound_cer = get_character_error_rate(ref[change_index+1], change_tup[1] + hyp[change_index+1])
-                right_compound_del_count = get_character_del_count(ref[change_index+1], change_tup[1] + hyp[change_index+1], language)
+                right_compound_del_count = get_character_del_count(ref[change_index+1], change_tup[1] + hyp[change_index+1], char_dists)
 
-                right_base_edit_count = get_character_change_count(ref[change_index+1], hyp[change_index+1], language)
-                right_compound_edit_count = get_character_change_count(ref[change_index+1], change_tup[1] + hyp[change_index+1], language)
+                right_base_edit_count = get_character_change_count(ref[change_index+1], hyp[change_index+1], char_dists)
+                right_compound_edit_count = get_character_change_count(ref[change_index+1], change_tup[1] + hyp[change_index+1], char_dists)
 
             # left_delta = left_base_cer - left_compound_cer 
             left_delta_del = left_base_del_count - left_compound_del_count
@@ -399,21 +376,21 @@ def check_word_compounding(changes_tuples, index_changes, ref, hyp, language):
             # ||       ||           ||   I | I | I | I | I | I |   |   |   |   |   |   |   |      ||
             if change_index - 1 >= 0 and ref[change_index-1] not in ['', ' ']:
                 # left_base_cer = get_character_error_rate(ref[change_index-1], hyp[change_index-1])
-                left_base_ins_count = get_character_ins_count(ref[change_index-1], hyp[change_index-1], language)
+                left_base_ins_count = get_character_ins_count(ref[change_index-1], hyp[change_index-1], char_dists)
                 #  left_compound_cer = get_character_error_rate(ref[change_index-1] + change_tup[0], hyp[change_index-1])
-                left_compound_ins_count = get_character_ins_count(ref[change_index-1] + change_tup[0], hyp[change_index-1], language)
+                left_compound_ins_count = get_character_ins_count(ref[change_index-1] + change_tup[0], hyp[change_index-1], char_dists)
 
-                left_base_edit_count = get_character_change_count(ref[change_index-1], hyp[change_index-1], language)
-                left_compound_edit_count = get_character_change_count(ref[change_index-1] + change_tup[0], hyp[change_index-1], language)
+                left_base_edit_count = get_character_change_count(ref[change_index-1], hyp[change_index-1], char_dists)
+                left_compound_edit_count = get_character_change_count(ref[change_index-1] + change_tup[0], hyp[change_index-1], char_dists)
 
             if change_index + 1 < len(ref) and ref[change_index+1] not in ['', ' ']:
                 #  right_base_cer = get_character_error_rate(ref[change_index+1], hyp[change_index+1])
-                right_base_ins_count = get_character_ins_count(ref[change_index+1], hyp[change_index+1], language)
+                right_base_ins_count = get_character_ins_count(ref[change_index+1], hyp[change_index+1], char_dists)
                 #  right_compound_cer = get_character_error_rate(change_tup[0] + ref[change_index+1], hyp[change_index+1])
-                right_compound_ins_count = get_character_ins_count(change_tup[0] + ref[change_index+1], hyp[change_index+1], language)
+                right_compound_ins_count = get_character_ins_count(change_tup[0] + ref[change_index+1], hyp[change_index+1], char_dists)
 
-                right_base_edit_count = get_character_change_count(ref[change_index+1], hyp[change_index+1], language)
-                right_compound_edit_count = get_character_change_count(change_tup[0] + ref[change_index+1], hyp[change_index+1], language)
+                right_base_edit_count = get_character_change_count(ref[change_index+1], hyp[change_index+1], char_dists)
+                right_compound_edit_count = get_character_change_count(change_tup[0] + ref[change_index+1], hyp[change_index+1], char_dists)
         
             #  left_delta = left_base_cer - left_compound_cer
             left_delta_ins = left_base_ins_count - left_compound_ins_count
