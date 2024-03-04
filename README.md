@@ -22,7 +22,7 @@ This package can be pip installed and thus imported into code regarless of it's 
 
 To pip install 
 
-1. Nativate to this `match_em` directory
+1. Navigate to this `match_em` directory
 2. Run `pip install .` 
 
 ## Implementation details
@@ -92,11 +92,11 @@ Thus a vector like `[1, 0, 1, 2, 0]` would represent a voiced, nasal, alveolar s
 
 #### Vowel vectors
 
-| vector value | height | front/back | rouding |
+| vector value | height | front/back | rounding |
 |--------------|--------|------------|---------|
 | 0            | high   | back       | false   |
 | 1            | mid    | mid        | true    |
-| 2            | low    | back       |         | 
+| 2            | low    | front       |         | 
 
 Thus a vector like `[0, 2, 1]` would represent the high, back, rounded vowel /u/
 
