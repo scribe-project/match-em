@@ -85,55 +85,57 @@ def shift_left(token_lists, change_tuples, shifting):
     # since we're shifting left we can't left-shift the first word
     for i in range(1, len(change_tuples)):
         change_tup = change_tuples[i]
-        if change_tup[shifting_to_index[shifting]] != ' ':
-            for shift_amount in range(1, (i+1)):
-                prev_staying_token = staying_tokens[change_tup[2] - shift_amount]
-                prev_shifting_token = shifting_tokens[change_tup[2] - shift_amount]
-                base_cer = get_character_change_count(prev_staying_token, prev_shifting_token)
-                new_cer = get_character_change_count(prev_staying_token, prev_shifting_token + change_tup[shifting_to_index[shifting]])
-                if new_cer < base_cer:
-                    new_token = prev_shifting_token + ' ' + change_tup[shifting_to_index[shifting]]
-                    shifting_tokens[change_tup[2] - shift_amount] = new_token
-                    # first update the prev change tuple
-                    prev_change_tup = change_tuples[i - shift_amount]
-                    # there was already a change for the word, we'll just add to it
-                    if prev_change_tup[2] == change_tup[2] - shift_amount:
-                        if new_token.strip() == prev_change_tup[get_shifting_opposite(shifting_to_index[shifting])].strip():
-                            # we've aligned 2 words that are exactly the same and we don't need this change tuple
-                            change_tuples.pop(i - shift_amount)
-                            # we don't need to update the change tuples further because we've not modified the number of tokens 
-                            # we we have changed change_tuples so we'll need to update the index
-                            i -= 1
+        # double check we're not messing with already fine compound pairs
+        if get_character_change_count(change_tup[0], change_tup[1]) > 0:
+            if change_tup[shifting_to_index[shifting]] != ' ':
+                for shift_amount in range(1, (i+1)):
+                    prev_staying_token = staying_tokens[change_tup[2] - shift_amount]
+                    prev_shifting_token = shifting_tokens[change_tup[2] - shift_amount]
+                    base_cer = get_character_change_count(prev_staying_token, prev_shifting_token)
+                    new_cer = get_character_change_count(prev_staying_token, prev_shifting_token + change_tup[shifting_to_index[shifting]])
+                    if new_cer < base_cer:
+                        new_token = prev_shifting_token + ' ' + change_tup[shifting_to_index[shifting]]
+                        shifting_tokens[change_tup[2] - shift_amount] = new_token
+                        # first update the prev change tuple
+                        prev_change_tup = change_tuples[i - shift_amount]
+                        # there was already a change for the word, we'll just add to it
+                        if prev_change_tup[2] == change_tup[2] - shift_amount:
+                            if new_token.strip() == prev_change_tup[get_shifting_opposite(shifting_to_index[shifting])].strip():
+                                # we've aligned 2 words that are exactly the same and we don't need this change tuple
+                                change_tuples.pop(i - shift_amount)
+                                # we don't need to update the change tuples further because we've not modified the number of tokens 
+                                # we we have changed change_tuples so we'll need to update the index
+                                i -= 1
+                            else:
+                                new = ['', '', prev_change_tup[2]]
+                                new[shifting_to_index[shifting]] = new_token
+                                new[get_shifting_opposite(shifting_to_index[shifting])] = prev_change_tup[get_shifting_opposite(shifting_to_index[shifting])]
+                                change_tuples[i - shift_amount] = tuple(new)
+                        # is this now completely illegible...maybe...
+                        # bascially we want to check if the other word in the change tuple was a real word of a blank
+                        if change_tup[get_shifting_opposite(shifting_to_index[shifting])] == ' ':
+                            # get rid of the unnecessary token
+                            shifting_tokens.pop(change_tup[2])
+                            # this means we'll want to remove the tuple as well as the empty space from the staying tokens
+                            change_tuples.pop(i)
+                            staying_tokens.pop(change_tup[2])
+                            change_tuples = update_change_tuples(change_tuples, index_greater_than=change_tup[2] - 1)
                         else:
-                            new = ['', '', prev_change_tup[2]]
-                            new[shifting_to_index[shifting]] = new_token
-                            new[get_shifting_opposite(shifting_to_index[shifting])] = prev_change_tup[get_shifting_opposite(shifting_to_index[shifting])]
-                            change_tuples[i - shift_amount] = tuple(new)
-                    # is this now completely illegible...maybe...
-                    # bascially we want to check if the other word in the change tuple was a real word of a blank
-                    if change_tup[get_shifting_opposite(shifting_to_index[shifting])] == ' ':
-                        # get rid of the unnecessary token
-                        shifting_tokens.pop(change_tup[2])
-                        # this means we'll want to remove the tuple as well as the empty space from the staying tokens
-                        change_tuples.pop(i)
-                        staying_tokens.pop(change_tup[2])
-                        change_tuples = update_change_tuples(change_tuples, index_greater_than=change_tup[2] - 1)
+                            # update the word we moved to a blank
+                            shifting_tokens[change_tup[2]] = ' '
+                            # let it stand as an insertion
+                            new = ['', '', change_tup[2]]
+                            new[shifting_to_index[shifting]] = ' '
+                            new[get_shifting_opposite(shifting_to_index[shifting])] = change_tup[get_shifting_opposite(shifting_to_index[shifting])]
+                            change_tuples[i] = tuple(new)
+                        new_token_list = ['', '']
+                        new_token_list[shifting_to_index[shifting]] = shifting_tokens
+                        new_token_list[get_shifting_opposite(shifting_to_index[shifting])] = staying_tokens
+                        return(shift_left(new_token_list, change_tuples, shifting))
                     else:
-                        # update the word we moved to a blank
-                        shifting_tokens[change_tup[2]] = ' '
-                        # let it stand as an insertion
-                        new = ['', '', change_tup[2]]
-                        new[shifting_to_index[shifting]] = ' '
-                        new[get_shifting_opposite(shifting_to_index[shifting])] = change_tup[get_shifting_opposite(shifting_to_index[shifting])]
-                        change_tuples[i] = tuple(new)
-                    new_token_list = ['', '']
-                    new_token_list[shifting_to_index[shifting]] = shifting_tokens
-                    new_token_list[get_shifting_opposite(shifting_to_index[shifting])] = staying_tokens
-                    return(shift_left(new_token_list, change_tuples, shifting))
-                else:
-                    # we'll keep trying to shift as long as there's no word in our way
-                    if prev_shifting_token != ' ':
-                        break
+                        # we'll keep trying to shift as long as there's no word in our way
+                        if prev_shifting_token != ' ':
+                            break
 
     return base_token_lists, change_tuples, shifting
 
@@ -145,62 +147,64 @@ def shift_right(token_lists, change_tuples, shifting):
     # since we're shifting right we can't right-shift the last word
     for i in range(len(change_tuples)-1):
         change_tup = change_tuples[i]
-        if change_tup[shifting_to_index[shifting]] != ' ':
-            diff = len(staying_tokens) - change_tup[2] 
-            for shift_amount in range(1, diff):
-                next_staying_token = staying_tokens[change_tup[2] + shift_amount]
-                next_shifting_token = shifting_tokens[change_tup[2] + shift_amount]
-                base_cer = get_character_change_count(next_staying_token, next_shifting_token)
-                new_cer = get_character_change_count(next_staying_token, change_tup[shifting_to_index[shifting]] + next_shifting_token)
-                if new_cer < base_cer:
-                    new_token = change_tup[shifting_to_index[shifting]] + ' ' + next_shifting_token
-                    shifting_tokens[change_tup[2] + shift_amount] = new_token
-                    # first update the next change tuple
-                    next_change_tup = change_tuples[i + shift_amount]
-                    # there was already a change for the word, we'll just add to it
-                    if next_change_tup[2] == change_tup[2] + shift_amount:
-                        if new_token.strip() == next_change_tup[get_shifting_opposite(shifting_to_index[shifting])].strip():
-                            # we've aligned 2 words that are exactly the same and we don't need this change tuple
-                            change_tuples.pop(i + shift_amount)
-                            # now update the index that's tracking change_tuples
-                            i -= 1
+        # double check we're not messing with already fine compound pairs
+        if get_character_change_count(change_tup[0], change_tup[1]) > 0:
+            if change_tup[shifting_to_index[shifting]] != ' ':
+                diff = len(staying_tokens) - change_tup[2] 
+                for shift_amount in range(1, diff):
+                    next_staying_token = staying_tokens[change_tup[2] + shift_amount]
+                    next_shifting_token = shifting_tokens[change_tup[2] + shift_amount]
+                    base_cer = get_character_change_count(next_staying_token, next_shifting_token)
+                    new_cer = get_character_change_count(next_staying_token, change_tup[shifting_to_index[shifting]] + next_shifting_token)
+                    if new_cer < base_cer:
+                        new_token = change_tup[shifting_to_index[shifting]] + ' ' + next_shifting_token
+                        shifting_tokens[change_tup[2] + shift_amount] = new_token
+                        # first update the next change tuple
+                        next_change_tup = change_tuples[i + shift_amount]
+                        # there was already a change for the word, we'll just add to it
+                        if next_change_tup[2] == change_tup[2] + shift_amount:
+                            if new_token.strip() == next_change_tup[get_shifting_opposite(shifting_to_index[shifting])].strip():
+                                # we've aligned 2 words that are exactly the same and we don't need this change tuple
+                                change_tuples.pop(i + shift_amount)
+                                # now update the index that's tracking change_tuples
+                                i -= 1
+                            else:
+                                new = ['', '', next_change_tup[2]]
+                                new[shifting_to_index[shifting]] = new_token
+                                new[get_shifting_opposite(shifting_to_index[shifting])] = next_change_tup[get_shifting_opposite(shifting_to_index[shifting])]
+                                change_tuples[ i+ shift_amount] = tuple(new)
+                        # is this now completely illegible...maybe...
+                        # bascially we want to check if the other word in the change tuple was a real word of a blank
+                        if change_tup[get_shifting_opposite(shifting_to_index[shifting])] == ' ':
+                            # now get rid of the token we added
+                            shifting_tokens.pop(change_tup[2])
+                            # this means we'll want to remove the tuple as well as the empty space from the staying tokens
+                            change_tuples.pop(i)
+                            staying_tokens.pop(change_tup[2])
+                            change_tuples = update_change_tuples(change_tuples, index_greater_than=change_tup[2])
                         else:
-                            new = ['', '', next_change_tup[2]]
-                            new[shifting_to_index[shifting]] = new_token
-                            new[get_shifting_opposite(shifting_to_index[shifting])] = next_change_tup[get_shifting_opposite(shifting_to_index[shifting])]
-                            change_tuples[ i+ shift_amount] = tuple(new)
-                    # is this now completely illegible...maybe...
-                    # bascially we want to check if the other word in the change tuple was a real word of a blank
-                    if change_tup[get_shifting_opposite(shifting_to_index[shifting])] == ' ':
-                        # now get rid of the token we added
-                        shifting_tokens.pop(change_tup[2])
-                        # this means we'll want to remove the tuple as well as the empty space from the staying tokens
-                        change_tuples.pop(i)
-                        staying_tokens.pop(change_tup[2])
-                        change_tuples = update_change_tuples(change_tuples, index_greater_than=change_tup[2])
+                            # update the word we moved to a blank
+                            shifting_tokens[change_tup[2]] = ' '
+                            # let it stand as an insertion
+                            new = ['', '', change_tup[2]]
+                            new[shifting_to_index[shifting]] = ' '
+                            new[get_shifting_opposite(shifting_to_index[shifting])] = change_tup[get_shifting_opposite(shifting_to_index[shifting])]
+                            change_tuples[i] = tuple(new)
+                        # if shifting is hyp then all of the change_tuples are bascially backwards so we'll reverse here
+                        if shifting_to_index[shifting]:
+                            change_tuples = [(tup[1], tup[0], tup[2]) for tup in change_tuples]
+                        shifting_tokens, staying_tokens, change_tuples = fix_del_ins_series(shifting_tokens, staying_tokens, change_tuples)
+                        # now undo the reversing
+                        if shifting_to_index[shifting]:
+                            change_tuples = [(tup[1], tup[0], tup[2]) for tup in change_tuples]
+                        new_token_list = ['', '']
+                        new_token_list[shifting_to_index[shifting]] = shifting_tokens
+                        new_token_list[get_shifting_opposite(shifting_to_index[shifting])] = staying_tokens
+                        return(shift_right(new_token_list, change_tuples, shifting))
                     else:
-                        # update the word we moved to a blank
-                        shifting_tokens[change_tup[2]] = ' '
-                        # let it stand as an insertion
-                        new = ['', '', change_tup[2]]
-                        new[shifting_to_index[shifting]] = ' '
-                        new[get_shifting_opposite(shifting_to_index[shifting])] = change_tup[get_shifting_opposite(shifting_to_index[shifting])]
-                        change_tuples[i] = tuple(new)
-                    # if shifting is hyp then all of the change_tuples are bascially backwards so we'll reverse here
-                    if shifting_to_index[shifting]:
-                        change_tuples = [(tup[1], tup[0], tup[2]) for tup in change_tuples]
-                    shifting_tokens, staying_tokens, change_tuples = fix_del_ins_series(shifting_tokens, staying_tokens, change_tuples)
-                    # now undo the reversing
-                    if shifting_to_index[shifting]:
-                        change_tuples = [(tup[1], tup[0], tup[2]) for tup in change_tuples]
-                    new_token_list = ['', '']
-                    new_token_list[shifting_to_index[shifting]] = shifting_tokens
-                    new_token_list[get_shifting_opposite(shifting_to_index[shifting])] = staying_tokens
-                    return(shift_right(new_token_list, change_tuples, shifting))
-                else:
-                    # we'll keep trying to shift as long as there's no word in our way 
-                    if next_shifting_token != ' ':
-                        break
+                        # we'll keep trying to shift as long as there's no word in our way 
+                        if next_shifting_token != ' ':
+                            break
     return base_token_lists, change_tuples, shifting
 
 def count_compounds_created_broken(change_tuples):
