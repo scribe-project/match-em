@@ -522,6 +522,51 @@ class AlignmentsNewTests(unittest.TestCase):
             [(' ', 'er', 1), (' ', 'det', 2), (' ', 'en', 3), ('barnet serie', 'barneserie', 4)]
         )
 
+    def test_check_word_compounding_fakeEx_1(self):
+        ref = ['white',      ' ',  ' ',      ' ', 'house']
+        hyp = ['whitehouse', 'is', 'a', 'really', 'bighouse']
+        change_tuples = [('white', 'whitehouse', 0), (' ', 'is', 1), (' ', 'a', 2), (' ', 'really', 3), ('house', 'bighouse', 4)]
+        ref, hyp, change_tuples, _, created_count, broken_count, created_joins, broken_joins = match_em.alignments_new.check_word_compounding(
+                ref,
+                hyp,
+                change_tuples
+            )
+        self.assertEqual(
+            ref,
+            ['white house', ' ', ' ', ' ', ' ',]
+        )
+        self.assertEqual(
+            hyp,
+            ['whitehouse', 'is', 'a', 'really', 'bighouse']
+        )
+        self.assertEqual(
+            change_tuples,
+            [
+                ('white house', 'whitehouse', 0),
+                (' ', 'is', 1), 
+                (' ', 'a', 2), 
+                (' ', 'really', 3), 
+                (' ', 'bighouse', 4)
+            ]
+        )
+        # self.assertEqual(
+        #     0,
+        #     created_count
+        # )
+        # self.assertEqual(
+        #     0,
+        #     broken_count
+        # )
+        # self.assertEqual(
+        #     1,
+        #     created_joins
+        # )
+        # self.assertEqual(
+        #     0,
+        #     broken_joins
+        # )
+
+
     def test_check_word_compounding_realEx_1(self):
         change_tuples = [('to', ' ', 3), ('tusen', 'totusenogti', 4), ('og', 'for', 5), ('ti', ' ', 6), ('forløses', 'løse', 7), ('ei', 'seg', 8), ('lita', 'lite', 9), (' ', 'av', 10), ('jente', 'jenter', 11), ('nødkeisersnitt', 'nødkaisersnitt', 13)]
         ref = ['fredag', 'tjuefjerde', 'september', 'to', 'tusen',       'og',  'ti', 'forløses', 'ei', 'lita',  ' ', 'jente', 'ved', 'nødkeisersnitt']

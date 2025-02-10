@@ -10,8 +10,8 @@ include = ["LICENCE"]
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
-numpy = "1.21.0"
-pandas = "1.4.0"
+numpy = "1.24.3"
+pandas = "2.0.2"
 python-Levenshtein = "0.12.2"
 
 [build-system]
