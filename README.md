@@ -2,6 +2,10 @@
 
 The goal of this package is to extend/modify word alignment and error calculations to better understand the sorts of errors that wav2vec2 (and other ASR able to output sub-words) is making. This has resulted in alignments that consider word similarities and tries to create the best possible, human-like alignment between two word streams. 
 
+If you find this code/method useful, please cite:
+
+Phoebe Parsons, Knut Kvale, Torbjørn Svendsen, and Giampiero Salvi. 2025. [Match ‘em: Multi-Tiered Alignment for Error Analysis in ASR](https://aclanthology.org/2025.nodalida-1.48/). In _Proceedings of the Joint 25th Nordic Conference on Computational Linguistics and 11th Baltic Conference on Human Language Technologies (NoDaLiDa/Baltic-HLT 2025)_, pages 440–447, Tallinn, Estonia. University of Tartu Library.
+
 ### Table of contents
 
 - [Installation](#installation)
